@@ -3,9 +3,37 @@ local addonName, ns = ...
 -- Get version from TOC file
 local version = GetAddOnMetadata(addonName, "Version") or "1.0.0"
 
+local function NormalizeLanguage(language)
+    if language == "zhCN" or language == "zhTW" then return "zhCN" end
+    if language == "frFR" then return "frFR" end
+    if language == "esES" or language == "esMX" then return "esES" end
+    if language == "deDE" then return "deDE" end
+    if language == "enUS" or language == "enGB" then return "enUS" end
+end
+
+function ns:GetClientLanguage()
+    return NormalizeLanguage(GetLocale()) or "enUS"
+end
+
+function ns:GetActiveLanguage()
+    local savedLanguage = TurboPlatesDB and NormalizeLanguage(TurboPlatesDB.language)
+    return savedLanguage or self:GetClientLanguage()
+end
+
+function ns:ShouldUseLocale(language)
+    return self:GetActiveLanguage() == NormalizeLanguage(language)
+end
+
 ns.L = {
     Title = "TurboPlates v" .. version,
     Author = "Author: surm",
+    Language = "Language",
+    LanguageEnglish = "English",
+    LanguageChinese = "Simplified Chinese",
+    LanguageFrench = "French",
+    LanguageSpanish = "Spanish",
+    LanguageGerman = "German",
+    LanguageReloadPrompt = "Changing language requires a UI reload. Reload now?",
 
     TabGeneral = "General",
     TabStyle = "Nameplate Style",
@@ -17,7 +45,7 @@ ns.L = {
     TabPersonal = "Personal Bar",
     TabCP = "Combo Points",
     TabTurboDebuffs = "TurboDebuffs",
-    
+
     -- Personal Bar
     PersonalBarEnable = "Enable Personal Resource Bar",
     PersonalBarEnableDesc = "Show your own nameplate with health and power bars",
@@ -36,17 +64,21 @@ ns.L = {
     PersonalBarBorderDebuffOnly = "No Borders Unless Debuff",
     PersonalBarBorderBlack = "Default Black",
     PersonalBarYOffset = "Vertical Offset",
+    PersonalBarBuffXOffset = "Buffs X Position",
+    PersonalBarBuffYOffset = "Buffs Y Position",
+    PersonalBarDebuffXOffset = "Debuffs X Position",
+    PersonalBarDebuffYOffset = "Debuffs Y Position",
     PersonalBarHealthColor = "Health Bar Color",
 
     PersonalBarPowerColorByType = "Color Power by Type",
     PersonalBarShowAdditionalPower = "Show Mana When Shapeshifted",
     PersonalBarAdditionalPowerHeight = "Additional Power Height",
     HeroPowerOrder = "Power Bar Order",
-    TabObjectives = "Quest Objectives",
+    TabObjectives = "Mob Indicators",
     TabMisc = "Misc Options",
     TabStacking = "Plate Stacking",
     TabProfiles = "Profiles",
-    
+
     -- Import/Export (Profiles Tab)
     ImportExportHeader = "Import / Export Settings",
     ImportExportDesc = "Export your settings to share with others, or import a settings string to apply someone else's configuration.",
@@ -65,7 +97,7 @@ ns.L = {
     ImportEmpty = "Please paste a settings string first.",
     CopySuccess = "Copied to clipboard!",
     CopyEmpty = "Nothing to copy. Export first.",
-    
+
     -- Stacking Tab
     StackingHeader = "Nameplate Stacking:",
     StackingEnable = "Enable Nameplate Stacking",
@@ -75,6 +107,7 @@ ns.L = {
     StackingPresetChill = "Chill",
     StackingPresetSnappy = "Snappy",
     StackingPresetReloadPrompt = "Changing preset requires a UI reload. Reload now?",
+    StackingClickboxNote = "Note: Stacking offsets are based on Clickable Nameplate Size values (under Misc tab)",
     -- Spring Physics
     StackingSpringHeader = "Animation Speed:",
     StackingSpringRaise = "Rise Speed",
@@ -93,15 +126,16 @@ ns.L = {
     StackingOriginPosDesc = "Base nameplate height above mob (0%=none, 100%=default, 200%=high)",
     StackingUpperBorder = "Screen Top Margin",
     StackingUpperBorderDesc = "Distance from screen top that plates cannot cross (lower = more screen use)",
-    
+
     -- Non-Target Alpha
     NonTargetAlpha = "Non-Target Alpha",
     NonTargetAlphaDesc = "Opacity of non-targeted nameplates when you have a target (0% = invisible, 100% = fully visible)",
-    
+
     -- Potato PC Mode
+    PerformanceHeader = "Performance:",
     PotatoPCMode = "Potato PC Mode",
     PotatoPCModeDesc = "Reduces CPU usage by halving update frequencies. Recommended for older or slow PCs.",
-    
+
     -- Auras Tab
     AurasShowDebuffs = "Enable Debuff Tracking",
     AurasOwnOnly = "Own Only",
@@ -114,6 +148,7 @@ ns.L = {
     AurasShowBuffs = "Enable Buff Tracking",
     AurasBuffFilterOnlyDispellable = "Only Dispellable",
     AurasBuffFilterWhitelistDispellable = "Whitelist + Dispellable",
+    AurasBuffFilterWhitelistOnly = "Whitelist Only",
     AurasBuffFilterAll = "All (except Blacklisted)",
     AurasBuffFilterDisabled = "Disabled",
     AurasMaxBuffs = "Max Buffs",
@@ -145,7 +180,7 @@ ns.L = {
     AurasBorderColorCoded = "Color Coded",
     AurasBorderDispellable = "Dispellable",
     AurasBorderCustom = "Custom Color",
-    
+
     -- Text Anchor Options
     AurasDurationAnchor = "Timer Anchor",
     AurasStackAnchor = "Stack Anchor",
@@ -155,12 +190,12 @@ ns.L = {
     AurasAnchorBottom = "Bottom",
     AurasAnchorBottomLeft = "Bottom Left",
     AurasAnchorBottomRight = "Bottom Right",
-    
+
     -- Aura Colors (Colors Tab)
     AuraColors = "Aura Colors:",
     DebuffBorderColor = "Debuff Border",
     BuffBorderColor = "Buff Border",
-    
+
     -- Spell List Manager
     SpellListHeader = "Spell Filters",
     AuraBlacklist = "Aura Blacklist",
@@ -180,7 +215,13 @@ ns.L = {
     SpellAdded = "Spell added",
     SpellRemoved = "Spell removed",
     ListCleared = "List cleared",
-    
+    CustomAuraNameplateColor = "Custom Nameplate Color by Aura (Priority List)",
+    CustomAuraNameplateColorDesc = "First matching buff/debuff rule overrides the nameplate health bar color.",
+    AuraColorSpellID = "Spell ID",
+    AuraColorOwnOnly = "Own Only",
+    AuraColorAddRule = "Add Rule",
+    AuraColorNoRules = "No aura color rules",
+
     -- General Tab (CVar Controls)
     ShowNameplatesFor = "Show Nameplates for:",
     FriendlyUnits = "Friendly Units",
@@ -210,20 +251,24 @@ ns.L = {
     HighlightSpells = "Highlight Spells",
     HighlightSpellsDesc = "Spells with custom highlight",
     NoHighlightSpells = "No spells configured",
-    
-    
+
+
     -- General Options Section
     GeneralOptionsHeader = "Friendly Nameplates:",
-    
+
     -- PvP Section
     PvPHeader = "PvP:",
     ClassColoredHealth = "Class Colored Health",
     ClassColoredName = "Class Colored Name",
     ArenaNumbers = "Arena: Show Arena Numbers",
     HealerMarks = "Arena/BG: Healer Icons",
-    TargetingMeIndicator = "Arena: Targeting Me Indicator",
-    TargetingMeColor = "(Arena) Targeting Me",
-    
+    HealerMarksDisabled = "Disabled",
+    HealerMarksEnemiesOnly = "Enemies Only",
+    HealerMarksFriendlyOnly = "Friendly Only",
+    HealerMarksBoth = "Both",
+    TargetingMeIndicator = "Targeting Me",
+    TargetingMeColor = "Targeting Me",
+
     -- Quest Objectives
     ShowQuestNPCs = "Show Quest NPCs",
     ShowQuestObjectives = "Show Quest Objectives",
@@ -231,6 +276,11 @@ ns.L = {
     QuestIconAnchor = "Quest Icon Anchor",
     QuestIconX = "Icon X Offset",
     QuestIconY = "Icon Y Offset",
+    EliteBossIndicator = "Elite/Boss Indicator",
+    EliteBossIconAnchor = "Elite/Boss Anchor",
+    EliteBossIconX = "Elite/Boss X Offset",
+    EliteBossIconY = "Elite/Boss Y Offset",
+    EliteBossIconSize = "Elite/Boss Size",
 
     Width = "Nameplate Width",
     HpHeight = "Healthbar Height",
@@ -242,6 +292,9 @@ ns.L = {
     FriendlyScale = "Friendly Nameplate Scale",
     RaidMarkerSize = "Raid Marker Size",
     RaidMarkerAnchor = "Raid Marker Anchor",
+    RaidMarkerAnchorLeft = "Left",
+    RaidMarkerAnchorRight = "Right",
+    RaidMarkerAnchorTop = "Top (Above Name)",
     RaidMarkerX = "Raid Marker X",
     RaidMarkerY = "Raid Marker Y",
     Texture = "Bar Texture",
@@ -255,7 +308,7 @@ ns.L = {
     TankModeEnabled = "Always On",
     FriendlyFontSize = "Friendly Name-Only Size",
     GuildFontSize = "Friendly Guild Name Size",
-    
+
     -- Tank Mode Colors
     TankColors = "Tank Mode Colors:",
     CastbarColors = "Castbar Colors:",
@@ -266,21 +319,22 @@ ns.L = {
     TransColor = "Losing",
     InsecureColor = "Lost",
     OffTankColor = "Off-Tank",
-    
+
     -- DPS Mode Colors
     DpsColors = "DPS/Healer Colors:",
     DpsSecureColor = "Safe",
     DpsTransColor = "Warning",
     DpsAggroColor = "Aggro",
-    
+
     -- Target/PvP Colors
     TargetPvPColors = "Target/PvP Colors:",
 
     Font = "Font",
     FontSize = "Nameplate Name Size",
+    NameTextYOffset = "Nameplate Name Y Offset",
     FontOutline = "Font Outline",
     NameDisplayFormat = "Name Display Format",
-    
+
     -- Health Value Display
     HealthValueFormat = "Health Value Format",
     HealthValueFontSize = "Health Value Font Size",
@@ -308,6 +362,7 @@ ns.L = {
     TargetGlow = "Target Glow",
     TargetArrow = "Target Arrow",
     TargetGlowColor = "Target Glow",
+    MouseoverGlowColor = "Mouseover Glow",
     ClickableAreaHeader = "Nameplate Clickable Area Settings:",
     ClickableWidth = "Clickable Width",
     ClickableHeight = "Clickable Height",
@@ -321,16 +376,6 @@ ns.L = {
     LevelSize = "Size",
     LevelX = "X Position",
     LevelY = "Y Position",
-
-    -- Classification Icon
-    ClassificationAnchor = "Classification Icon",
-    ClassificationDisabled = "Disabled",
-    ClassificationTopLeft = "Top Left",
-    ClassificationTopRight = "Top Right",
-    ClassificationTop = "Top",
-    ClassificationBottom = "Bottom",
-    ClassificationBottomLeft = "Bottom Left",
-    ClassificationBottomRight = "Bottom Right",
 
     -- Threat Text
     ThreatTextAnchor = "Threat Text Display",
@@ -359,13 +404,158 @@ ns.L = {
     LivePreview = "Live Preview",
     LeftClick = "Left Click: ",
     Settings = "Settings",
-    Reload = "Right Click: Reload UI"
+    Reload = "Right Click: Reload UI",
+
+    Reset = "Reset",
+    ClassificationAnchor = "Classification Icon",
+    ClassificationDisabled = "Disabled",
+    ClassificationTopLeft = "Top Left",
+    ClassificationTopRight = "Top Right",
+    ClassificationTop = "Top",
+    ClassificationBottom = "Bottom",
+    ClassificationBottomLeft = "Bottom Left",
+    ClassificationBottomRight = "Bottom Right",
+
+    -- Hardcoded string fallbacks
+    BoostedBy = "Boosted by |cff4fa3ffT|cff5fb6f7u|cff6fcaefr|cff7fdee7b|cff8ff2d8o|cff9ff6b0P|cfffff68fl|cffffd36da|cffffb24at|cffff9138e|cffff3300s|r v%s - /tp for config",
+    OptionsClosedCombat = "|cff4fa3ffT|cff5fb6f7u|cff6fcaefr|cff7fdee7b|cff8ff2d8o|cff9ff6b0P|cfffff68fl|cffffd36da|cffffb24at|cffff9138e|cffff3300s|r: Options closed due to combat.",
+    OptionsWillOpen = "|cff4fa3ffT|cff5fb6f7u|cff6fcaefr|cff7fdee7b|cff8ff2d8o|cff9ff6b0P|cfffff68fl|cffffd36da|cffffb24at|cffff9138e|cffff3300s|r: Options will open after combat ends.",
+    ConflictText = "|cff4fa3ffTurboPlates|r has detected an incompatible nameplate addon: |cffff6666%s|r\n\nOnly one nameplate addon can be active at a time.",
+    DisableIt = "Disable It",
+    DisableTP = "Disable TurboPlates",
+    ResetText = "Reset all TurboPlates settings to defaults?\n\nThis will reload your UI.\n(Spell lists will be preserved)",
+    ResetYes = "Yes",
+    ResetNo = "No",
+    ReloadRequired = "This setting requires a UI reload to take full effect. Reload now?",
+    ReloadNow = "Reload",
+    Later = "Later",
+    ImportReload = "Settings imported successfully!\n\nReload now to apply changes?",
+    WhitelistName = "Whitelist",
+    BlacklistName = "Blacklist",
+    RemovedFrom = "Removed from %s - %s",
+    AddedTo = "Added to %s - %s",
+    SpellAlreadyIn = "Spell already in %s",
+    ClearSpellList = "Clear all spells from %s?",
+    RemovedFromHL = "Removed from Highlight List - %s",
+    AddedToHL = "Added to Highlight List - %s",
+    SpellAlreadyInHL = "Spell already in Highlight List",
+    EnableTurboDebuffs = "Enable TurboDebuffs",
+    TurboDebuffsDesc = "Performance optimized custom 'BigDebuffs' integration, built from scratch for Ascension. Respects Aura Blacklist entries.",
+    TDShowForFriendlies = "Show for Friendlies",
+    TDNormalNameplates = "Normal Nameplates:",
+    TDFriendlyNameOnly = "Friendly Name-Only Plates:",
+    TDIconPosition = "Icon Position",
+    TDIconSize = "Icon Size",
+    TDTimerFontSize = "Timer Font Size",
+    TDXOffset = "X Offset",
+    TDYOffset = "Y Offset",
+    TDShowCategories = "Show Categories:",
+    TDImmunities = "Immunities",
+    TDCrowdControl = "Crowd Control",
+    TDSilences = "Silences",
+    TDInterrupts = "Interrupts",
+    TDRoots = "Roots",
+    TDDisarms = "Disarms",
+    TDDefensiveBuffs = "Defensive Buffs",
+    TDOffensiveBuffs = "Offensive Buffs",
+    TDOtherBuffs = "Other Buffs",
+    TDSnares = "Snares",
+    TDLeft = "Left",
+    TDRight = "Right",
+    TDTop = "Top",
+    TDBottom = "Bottom",
+    StackingStats = "[TurboPlates Stacking] Active: %d, DataPool: %d, EntryPool: %d",
+    StackingCommands = "[TurboPlates Stacking Commands]",
+    StackingStatsCmd = "  /tp stacking stats - Show pool statistics",
+    ExportNoSettings = "No settings to export",
+    ExportNoCategory = "No categories selected",
+    ExportNoData = "No data to export",
+    ExportSerialFailed = "Serialization failed",
+    ExportCompressFailed = "Compression failed",
+    ExportEncodeFailed = "Encoding failed",
+    ImportEmptyStr = "Empty import string",
+    ImportInvalidPrefix = "Invalid format (missing TurboPlates prefix)",
+    ImportDecodeFailed = "Decode failed - invalid string",
+    ImportDecompressFailed = "Decompression failed - corrupted data",
+    ImportDeserializeFailed = "Deserialize failed - invalid data",
+    ImportValidationFailed = "Validation failed - malformed settings",
+    ImportNoMatch = "No matching data found in string",
+    ImportSuccessStr = "Imported: %s",
+    LabelSettings = "Settings",
+    LabelHighlights = "Spell Highlights",
+    LabelWhitelist2 = "Whitelist",
+    LabelBlacklist2 = "Blacklist",
+    LabelDeleted = "Deleted",
+    Yes = "Yes",
+    No = "No"
 }
+
+local defaultLocale = {}
+for k, v in pairs(ns.L) do
+    defaultLocale[k] = v
+end
+
+ns.locales = {}
+ns.localePostApply = {}
+
+function ns:NewLocale(language)
+    local normalizedLanguage = NormalizeLanguage(language)
+    local locale = {}
+    if normalizedLanguage then
+        self.locales[normalizedLanguage] = locale
+    end
+    return locale
+end
+
+function ns:RegisterLocalePostApply(language, callback)
+    local normalizedLanguage = NormalizeLanguage(language)
+    if normalizedLanguage and type(callback) == "function" then
+        self.localePostApply[normalizedLanguage] = callback
+    end
+end
+
+function ns:ApplyActiveLocale()
+    local activeLanguage = self:GetActiveLanguage()
+    local locale = self.locales[activeLanguage] or self.locales.enUS
+
+    for k, v in pairs(defaultLocale) do
+        self.L[k] = v
+    end
+
+    if locale then
+        for k, v in pairs(locale) do
+            self.L[k] = v
+        end
+    end
+
+    local postApply = self.localePostApply[activeLanguage]
+    if postApply then
+        postApply()
+    end
+
+    if self.RefreshLocalizedStaticPopups then
+        self:RefreshLocalizedStaticPopups()
+    end
+end
+
+ns.CJK_FONT_NAME = "Noto Sans CJK SC"
+ns.CJK_FONT_PATH = "Interface\\AddOns\\TurboPlates\\Fonts\\NotoSansSC-Regular.ttf"
+
+ns.DEFAULT_FONT_PATH = "Interface\\AddOns\\TurboPlates\\Fonts\\FRIZQT__.TTF"
+
+function ns:SetFontSafe(fontString, fontPath, size, outline)
+    if not fontString then return end
+    fontString:SetFont(fontPath or self.DEFAULT_FONT_PATH, size, outline or "")
+    if not fontString:GetFont() then
+        fontString:SetFont(self.DEFAULT_FONT_PATH, size, outline or "")
+    end
+end
 
 ns.Fonts = {
     -- Default WoW Fonts
     { name = "Friz Quadrata",         path = "Interface\\AddOns\\TurboPlates\\Fonts\\FRIZQT__.TTF" },
     { name = "Arial Narrow",          path = "Interface\\AddOns\\TurboPlates\\Fonts\\ARIALN.TTF" },
+    { name = "Noto Sans CJK SC",      path = ns.CJK_FONT_PATH },
     { name = "Morpheus",              path = "Fonts\\MORPHEUS.TTF" },
     { name = "Skurri",                path = "Fonts\\SKURRI.TTF" },
     -- TurboPlates Fonts
@@ -419,6 +609,25 @@ ns.QuestIconAnchors = {
     { name = "Left", value = "LEFT" },
     { name = "Right", value = "RIGHT" },
     { name = "Top", value = "TOP" },
+}
+ns.EliteBossIconAnchors = {
+    { name = "Top Left", value = "TOPLEFT" },
+    { name = "Top", value = "TOP" },
+    { name = "Top Right", value = "TOPRIGHT" },
+    { name = "Left", value = "LEFT" },
+    { name = "Right", value = "RIGHT" },
+    { name = "Bottom Left", value = "BOTTOMLEFT" },
+    { name = "Bottom", value = "BOTTOM" },
+    { name = "Bottom Right", value = "BOTTOMRIGHT" },
+}
+ns.EliteBossIndicatorStyles = {
+    { name = "None", value = "none" },
+    { name = "Default", value = "default", preview = { atlas = "dungeonskull", w = 14, h = 14 } },
+    { name = "Colored Skulls", value = "colored_skulls", preview = { texture = "Interface\\AddOns\\TurboPlates\\Textures\\EliteIcons\\ElvUI_SkullIcon.tga", w = 22, h = 24, coords = { 0.078125, 0.9375, 0.03125, 0.96875 }, color = { 1, 0.05, 0.05 } } },
+    { name = "ElvUI Dragons", value = "elvui_dragons", preview = { texture = "Interface\\AddOns\\TurboPlates\\Textures\\EliteIcons\\ElvUI_Nameplates.blp", w = 31, h = 24, coords = { 0, 0.15234375, 0.359375, 0.59375 } } },
+    { name = "SRE - Classic", value = "sre_classic", preview = { texture = "Interface\\AddOns\\TurboPlates\\Textures\\EliteIcons\\SRE\\classic\\worldboss.tga", w = 39, h = 20, coords = { 0.00390625, 0.76171875, 0, 0.7734375 } } },
+    { name = "SRE - Modern", value = "sre_modern", preview = { texture = "Interface\\AddOns\\TurboPlates\\Textures\\EliteIcons\\SRE\\modern\\worldboss.tga", w = 30, h = 24, coords = { 0, 0.96875, 0, 0.78125 } } },
+    { name = "SRE - Tiny", value = "sre_tiny", preview = { texture = "Interface\\AddOns\\TurboPlates\\Textures\\EliteIcons\\SRE\\tiny\\worldboss.tga", w = 33, h = 22, coords = { 0.0078125, 0.96875, 0, 0.6484375 } } },
 }
 ns.HealthFormats = {
     { name = "None", value = "none" },
@@ -545,6 +754,7 @@ ns.defaults = {
     guildFontSize = 9,
     healthValueFormat = "percent",  -- Health value display format
     healthValueFontSize = 8,     -- Health value font size
+    nameTextYOffset = 0,         -- User-adjustable name text vertical offset
     nameInHealthbar = false,     -- Show name inside healthbar (left) with health value (right)
     hidePercentWhenFull = false,  -- Hide percent display when at full health (disabled by default)
     totemDisplay = "icon_name",   -- Totem display mode: disabled, hp_name, icon_only, icon_name, icon_hp, icon_name_hp
@@ -553,6 +763,7 @@ ns.defaults = {
     targetGlow = "border",  -- Target glow style: none, border, thick, thin
     targetArrow = "none",   -- Target arrow style: none, arrows_thin, arrows_normal, arrows_double
     targetGlowColor = { r = 0, g = 1, b = 1 },  -- Neon cyan
+    mouseoverGlowColor = { r = 1, g = 1, b = 1 },  -- White mouseover glow by default
     tappedColor = { r = 0.5, g = 0.5, b = 0.5 },  -- Grey for tapped units
     -- Quest objective icons
     showQuestNPCs = true,       -- Show quest pickup/turnin icons
@@ -575,15 +786,19 @@ ns.defaults = {
     nonTargetAlpha = 0.6,   -- Manual alpha for non-targeted nameplates (0-1)
     -- Level indicator
     levelMode = "all",  -- disabled, enemies, all
-    -- Classification icon
-    classificationAnchor = "TOPLEFT",  -- disabled, TOPLEFT, TOPRIGHT, TOP, BOTTOM, BOTTOMLEFT, BOTTOMRIGHT
-    
+    -- Elite/Boss classification icon
+    classificationStyle = "default",  -- none, default, colored_skulls, elvui_dragons, sre_classic, sre_modern, sre_tiny
+    classificationAnchor = "TOPLEFT", -- TOPLEFT, TOP, TOPRIGHT, LEFT, RIGHT, BOTTOMLEFT, BOTTOM, BOTTOMRIGHT
+    classificationX = 0,
+    classificationY = 0,
+    classificationSize = 18,
+
     -- Threat text display
     threatTextAnchor = "disabled",  -- disabled, right_hp, left_hp, below_hp, top_hp, left_name, right_name
     threatTextFontSize = 10,
     threatTextOffsetX = 2,
     threatTextOffsetY = 0,
-    
+
     -- === PERSONAL RESOURCE BAR ===
     personal = {
         enabled = false,  -- Disabled by default (also controls CVar)
@@ -608,7 +823,7 @@ ns.defaults = {
         yOffset = 0,
         borderStyle = "removable",  -- removable, black, debuff, debuff_only, none
     },
-    
+
     -- === AURA TRACKING ===
     auras = {
         -- Debuffs (Your DoTs on enemies) - HARMFUL|PLAYER filter
@@ -623,10 +838,10 @@ ns.defaults = {
         debuffBorderMode = "COLOR_CODED",  -- DISABLED, COLOR_CODED, CUSTOM
         debuffDurationAnchor = "BOTTOM",  -- TOP, TOPLEFT, TOPRIGHT, CENTER, BOTTOM, BOTTOMLEFT, BOTTOMRIGHT
         debuffStackAnchor = "TOPLEFT",   -- TOP, TOPLEFT, TOPRIGHT, CENTER, BOTTOM, BOTTOMLEFT, BOTTOMRIGHT
-        
+
         -- Buffs (Enemy buffs you can purge/steal)
         showBuffs = true,
-        buffFilterMode = "ONLY_DISPELLABLE",  -- ONLY_DISPELLABLE, WHITELIST_DISPELLABLE, ALL
+        buffFilterMode = "ONLY_DISPELLABLE",  -- ONLY_DISPELLABLE, WHITELIST_DISPELLABLE, WHITELIST_ONLY, ALL
         maxBuffs = 4,
         buffIconWidth = 18,
         buffIconHeight = 18,
@@ -641,28 +856,29 @@ ns.defaults = {
         buffMinDuration = 0,
         buffMaxDuration = 600,
         buffBorderMode = "COLOR_CODED",  -- DISABLED, COLOR_CODED, CUSTOM
-        
+
         -- Duration filters (for debuffs)
         minDuration = 0,       -- 0 = no minimum
         maxDuration = 0,       -- 0 = no maximum (unlimited)
-        
+
         -- Layout
         growDirection = "CENTER",  -- CENTER, LEFT, RIGHT
         iconSpacing = 2,
-        
+
         -- Sorting (LEAST_TIME or MOST_RECENT)
         debuffSortMode = "LEAST_TIME",
         buffSortMode = "MOST_RECENT",
-        
+
         -- Custom border colors
         debuffBorderColor = { r = 0.8, g = 0, b = 0 },  -- Red
         buffBorderColor = { r = 0.2, g = 0.8, b = 0.2 },  -- Green
-        
+
         -- Blacklist/Whitelist (spellID tables)
         blacklist = {},
         whitelist = {},
+        nameplateColorRules = {},
     },
-    
+
     -- === NAMEPLATE STACKING ===
     stacking = {
         enabled = false,          -- Custom stacking disabled by default
@@ -680,26 +896,26 @@ ns.defaults = {
         -- Limits
         maxPlates = 60,
     },
-    
+
     -- === TURBO DEBUFFS (BigDebuffs-style priority aura) ===
     turboDebuffs = {
         enabled = false,  -- Disabled by default (niche feature)
         showFriendly = false,  -- Show on friendly nameplates
-        
+
         -- Full plates settings
         size = 32,
         anchor = "RIGHT",
         xOffset = 0,
         yOffset = 0,
         timerSize = 22,
-        
+
         -- Name-only plates settings
         nameOnlyAnchor = "RIGHT",
         nameOnlySize = 24,
         nameOnlyTimerSize = 16,
         nameOnlyXOffset = 0,
         nameOnlyYOffset = 0,
-        
+
         -- Category toggles
         immunities = true,
         cc = true,
@@ -711,7 +927,7 @@ ns.defaults = {
         buffs_offensive = true,
         buffs_other = true,
         snare = true,
-        
+
         -- Category priorities
         priority = {
             immunities = 80,
@@ -740,7 +956,15 @@ end
 
 function ns:LoadVariables()
     if not TurboPlatesDB then TurboPlatesDB = {} end
-    
+
+    if TurboPlatesDB.language ~= nil then
+        TurboPlatesDB.language = NormalizeLanguage(TurboPlatesDB.language)
+    end
+
+    if ns.ApplyActiveLocale then
+        ns:ApplyActiveLocale()
+    end
+
     for k, v in pairs(ns.defaults) do
         if TurboPlatesDB[k] == nil then
             TurboPlatesDB[k] = DeepCopy(v)
@@ -752,7 +976,12 @@ function ns:LoadVariables()
             end
         end
     end
-    
+
+    -- Migrate the previous temporary default now that the base name position is corrected.
+    if TurboPlatesDB.nameTextYOffset == -1 then
+        TurboPlatesDB.nameTextYOffset = ns.defaults.nameTextYOffset
+    end
+
     -- Migrate font from path to LSM name
     if TurboPlatesDB.font and TurboPlatesDB.font:find("\\") then
         for _, f in ipairs(ns.Fonts) do
@@ -766,7 +995,7 @@ function ns:LoadVariables()
             TurboPlatesDB.font = "Friz Quadrata"
         end
     end
-    
+
     -- Migrate texture from path to LSM name
     if TurboPlatesDB.texture and TurboPlatesDB.texture:find("\\") then
         for _, t in ipairs(ns.Textures) do
@@ -780,12 +1009,47 @@ function ns:LoadVariables()
             TurboPlatesDB.texture = "Clean"
         end
     end
-    
+
     -- Validate texture (now LSM name)
     if not TurboPlatesDB.texture or TurboPlatesDB.texture == "" then
         TurboPlatesDB.texture = ns.defaults.texture
     end
-    
+
+    -- Restore the old default placement after the initial Mob Indicators build briefly collapsed it to LEFT.
+    if TurboPlatesDB._eliteBossAnchorMigration ~= 1 then
+        if TurboPlatesDB.classificationAnchor == "LEFT"
+            and (TurboPlatesDB.classificationX or 0) == 0
+            and (TurboPlatesDB.classificationY or 0) == 0 then
+            TurboPlatesDB.classificationAnchor = ns.defaults.classificationAnchor
+        end
+        TurboPlatesDB._eliteBossAnchorMigration = 1
+    end
+
+    -- Migrate/validate classification anchors for the Mob Indicators controls
+    if TurboPlatesDB.classificationAnchor == "disabled" then
+        TurboPlatesDB.classificationStyle = "none"
+        TurboPlatesDB.classificationAnchor = ns.defaults.classificationAnchor
+    elseif TurboPlatesDB.classificationAnchor ~= "TOPLEFT"
+        and TurboPlatesDB.classificationAnchor ~= "TOP"
+        and TurboPlatesDB.classificationAnchor ~= "TOPRIGHT"
+        and TurboPlatesDB.classificationAnchor ~= "LEFT"
+        and TurboPlatesDB.classificationAnchor ~= "RIGHT"
+        and TurboPlatesDB.classificationAnchor ~= "BOTTOMLEFT"
+        and TurboPlatesDB.classificationAnchor ~= "BOTTOM"
+        and TurboPlatesDB.classificationAnchor ~= "BOTTOMRIGHT" then
+        TurboPlatesDB.classificationAnchor = ns.defaults.classificationAnchor
+    end
+
+    if TurboPlatesDB.classificationStyle ~= "none"
+        and TurboPlatesDB.classificationStyle ~= "default"
+        and TurboPlatesDB.classificationStyle ~= "colored_skulls"
+        and TurboPlatesDB.classificationStyle ~= "elvui_dragons"
+        and TurboPlatesDB.classificationStyle ~= "sre_classic"
+        and TurboPlatesDB.classificationStyle ~= "sre_modern"
+        and TurboPlatesDB.classificationStyle ~= "sre_tiny" then
+        TurboPlatesDB.classificationStyle = ns.defaults.classificationStyle
+    end
+
     -- Validate color tables
     if type(TurboPlatesDB.hpColor) ~= "table" or not TurboPlatesDB.hpColor.r then
         TurboPlatesDB.hpColor = DeepCopy(ns.defaults.hpColor)
@@ -835,12 +1099,18 @@ function ns:LoadVariables()
     if type(TurboPlatesDB.targetingMeColor) ~= "table" or not TurboPlatesDB.targetingMeColor.r then
         TurboPlatesDB.targetingMeColor = DeepCopy(ns.defaults.targetingMeColor)
     end
+    if type(TurboPlatesDB.mouseoverGlowColor) ~= "table" or not TurboPlatesDB.mouseoverGlowColor.r then
+        TurboPlatesDB.mouseoverGlowColor = DeepCopy(ns.defaults.mouseoverGlowColor)
+    end
     if type(TurboPlatesDB.highlightGlowColor) ~= "table" or not TurboPlatesDB.highlightGlowColor.r then
         TurboPlatesDB.highlightGlowColor = DeepCopy(ns.defaults.highlightGlowColor)
     end
-    
+    if type(TurboPlatesDB.auras) == "table" and type(TurboPlatesDB.auras.nameplateColorRules) ~= "table" then
+        TurboPlatesDB.auras.nameplateColorRules = DeepCopy(ns.defaults.auras.nameplateColorRules)
+    end
+
     -- Update cached db reference
-    if ns.UpdateDBCache then 
+    if ns.UpdateDBCache then
         ns:UpdateDBCache()
     end
 end

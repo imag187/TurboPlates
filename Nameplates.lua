@@ -153,25 +153,25 @@ end
 function BorderMethods:UpdateScale(parent, thickness)
     thickness = thickness or 1
     local pixelSize = PixelUtil.GetNearestPixelSize(thickness, parent:GetEffectiveScale(), 1)
-    
+
     -- Update top edge
     self.top:ClearAllPoints()
     self.top:SetPoint("TOPLEFT", parent, "TOPLEFT", -pixelSize, pixelSize)
     self.top:SetPoint("TOPRIGHT", parent, "TOPRIGHT", pixelSize, pixelSize)
     PixelUtil.SetHeight(self.top, pixelSize, 1)
-    
+
     -- Update bottom edge
     self.bottom:ClearAllPoints()
     self.bottom:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", -pixelSize, -pixelSize)
     self.bottom:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", pixelSize, -pixelSize)
     PixelUtil.SetHeight(self.bottom, pixelSize, 1)
-    
+
     -- Update left edge
     self.left:ClearAllPoints()
     self.left:SetPoint("TOPLEFT", parent, "TOPLEFT", -pixelSize, 0)
     self.left:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", -pixelSize, 0)
     PixelUtil.SetWidth(self.left, pixelSize, 1)
-    
+
     -- Update right edge
     self.right:ClearAllPoints()
     self.right:SetPoint("TOPRIGHT", parent, "TOPRIGHT", pixelSize, 0)
@@ -183,9 +183,9 @@ end
 local function CreateTextureBorder(parent, thickness)
     thickness = thickness or 1
     local pixelSize = PixelUtil.GetNearestPixelSize(thickness, parent:GetEffectiveScale(), 1)
-    
+
     local border = setmetatable({}, BorderMethods)
-    
+
     -- Use OVERLAY layer so borders render ABOVE StatusBar fill texture (ARTWORK layer)
     -- Top edge
     border.top = parent:CreateTexture(nil, "OVERLAY")
@@ -193,31 +193,31 @@ local function CreateTextureBorder(parent, thickness)
     border.top:SetPoint("TOPLEFT", parent, "TOPLEFT", -pixelSize, pixelSize)
     border.top:SetPoint("TOPRIGHT", parent, "TOPRIGHT", pixelSize, pixelSize)
     PixelUtil.SetHeight(border.top, pixelSize, 1)
-    
+
     -- Bottom edge
     border.bottom = parent:CreateTexture(nil, "OVERLAY")
     border.bottom:SetTexture(BORDER_TEX)
     border.bottom:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", -pixelSize, -pixelSize)
     border.bottom:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", pixelSize, -pixelSize)
     PixelUtil.SetHeight(border.bottom, pixelSize, 1)
-    
+
     -- Left edge
     border.left = parent:CreateTexture(nil, "OVERLAY")
     border.left:SetTexture(BORDER_TEX)
     border.left:SetPoint("TOPLEFT", parent, "TOPLEFT", -pixelSize, 0)
     border.left:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", -pixelSize, 0)
     PixelUtil.SetWidth(border.left, pixelSize, 1)
-    
+
     -- Right edge
     border.right = parent:CreateTexture(nil, "OVERLAY")
     border.right:SetTexture(BORDER_TEX)
     border.right:SetPoint("TOPRIGHT", parent, "TOPRIGHT", pixelSize, 0)
     border.right:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", pixelSize, 0)
     PixelUtil.SetWidth(border.right, pixelSize, 1)
-    
+
     -- Default to black with alpha bias (prevents 1px dropout)
     border:SetColor(0, 0, 0, BORDER_ALPHA)
-    
+
     return border
 end
 
@@ -243,14 +243,14 @@ local THROTTLE = {
 -- Update cached db reference (called after settings change)
 function ns:UpdateDBCache()
     db = TurboPlatesDB or ns.defaults
-    
+
     -- Potato PC Mode: doubles throttle values
     ns.c_potatoMode = db.potatoMode == true
     ns.c_throttleMultiplier = ns.c_potatoMode and 2 or 1
-    
+
     -- Alpha setting for non-targeted nameplates (manual override since CVars don't exist)
     ns.c_nonTargetAlpha = db.nonTargetAlpha or 0.6
-    
+
     -- Cached settings
     ns.c_width = db.width or 110
     ns.c_hpHeight = db.hpHeight or 12
@@ -291,55 +291,55 @@ function ns:UpdateDBCache()
             if name then ns.c_highlightSpellNames[name] = true end
         end
     end
-    
+
     -- Tank mode settings
     ns.c_tankMode = db.tankMode or 0
-    
+
     -- Class color settings
     ns.c_classColoredHealth = db.classColoredHealth ~= false  -- true by default
     ns.c_classColoredName = db.classColoredName == true       -- false by default
     ns.c_arenaNumbers = db.arenaNumbers == true               -- false by default
     ns.c_healerMarks = db.healerMarks or 3                    -- 0 = disabled, 1 = enemies, 2 = friendly, 3 = both
     ns.c_executeRange = db.executeRange or 0                  -- 0 = disabled
-    
+
     -- Color settings
     local hpc = db.hpColor or { r = 1, g = 0.2, b = 0.2 }
     ns.c_hpColor_r, ns.c_hpColor_g, ns.c_hpColor_b = hpc.r, hpc.g, hpc.b
-    
+
     local pc = db.petColor or { r = 0.5, g = 0.5, b = 0.5 }
     ns.c_petColor_r, ns.c_petColor_g, ns.c_petColor_b = pc.r, pc.g, pc.b
-    
+
     -- Tapped unit color
     local tpc = db.tappedColor or { r = 0.5, g = 0.5, b = 0.5 }
     ns.c_tappedColor_r, ns.c_tappedColor_g, ns.c_tappedColor_b = tpc.r, tpc.g, tpc.b
-    
+
     -- Hostile name color
     local hnc = db.hostileNameColor or { r = 1, g = 1, b = 1 }
     ns.c_hostileNameColor_r, ns.c_hostileNameColor_g, ns.c_hostileNameColor_b = hnc.r, hnc.g, hnc.b
-    
+
     -- Tank mode colors
     local sc = db.secureColor or { r = 1, g = 0, b = 1 }
     ns.c_secureColor_r, ns.c_secureColor_g, ns.c_secureColor_b = sc.r, sc.g, sc.b
-    
+
     local tc = db.transColor or { r = 1, g = 0.8, b = 0 }
     ns.c_transColor_r, ns.c_transColor_g, ns.c_transColor_b = tc.r, tc.g, tc.b
-    
+
     local ic = db.insecureColor or { r = 1, g = 0, b = 0 }
     ns.c_insecureColor_r, ns.c_insecureColor_g, ns.c_insecureColor_b = ic.r, ic.g, ic.b
-    
+
     local oc = db.offTankColor or { r = 0.2, g = 0.7, b = 0.5 }
     ns.c_offTankColor_r, ns.c_offTankColor_g, ns.c_offTankColor_b = oc.r, oc.g, oc.b
-    
+
     -- DPS mode colors
     local dsc = db.dpsSecureColor or { r = 1, g = 0, b = 1 }
     ns.c_dpsSecureColor_r, ns.c_dpsSecureColor_g, ns.c_dpsSecureColor_b = dsc.r, dsc.g, dsc.b
-    
+
     local dtc = db.dpsTransColor or { r = 1, g = 0.8, b = 0 }
     ns.c_dpsTransColor_r, ns.c_dpsTransColor_g, ns.c_dpsTransColor_b = dtc.r, dtc.g, dtc.b
-    
+
     local dac = db.dpsAggroColor or { r = 1, g = 0, b = 0 }
     ns.c_dpsAggroColor_r, ns.c_dpsAggroColor_g, ns.c_dpsAggroColor_b = dac.r, dac.g, dac.b
-    
+
     -- Pet/Totem settings (visibility controlled by game CVars, these are just styling)
     ns.c_petScale = db.petScale or 0.7
     local totemMode = db.totemDisplay or "icon_name"
@@ -349,7 +349,7 @@ function ns:UpdateDBCache()
     ns.c_totemShowIcon = totemMode ~= "hp_name" and totemMode ~= "disabled"
     ns.c_totemShowName = totemMode ~= "icon_only" and totemMode ~= "icon_hp" and totemMode ~= "disabled"
     ns.c_totemShowHP = totemMode == "hp_name" or totemMode == "icon_hp" or totemMode == "icon_name_hp"
-    
+
     -- Combo point settings
     ns.c_showComboPoints = db.showComboPoints ~= false
     ns.c_cpOnPersonalBar = db.cpOnPersonalBar == true
@@ -358,20 +358,21 @@ function ns:UpdateDBCache()
     ns.c_cpY = db.cpY or 0
     ns.c_cpPersonalX = db.cpPersonalX or 0
     ns.c_cpPersonalY = db.cpPersonalY or 0
-    
+
     -- Castbar settings
     ns.c_showCastbar = db.showCastbar ~= false
     local cc = db.castColor or { r = 1, g = 0.8, b = 0 }
     ns.c_castColor_r, ns.c_castColor_g, ns.c_castColor_b = cc.r, cc.g, cc.b
     local nic = db.noInterruptColor or { r = 0.6, g = 0.6, b = 0.6 }
     ns.c_noInterruptColor_r, ns.c_noInterruptColor_g, ns.c_noInterruptColor_b = nic.r, nic.g, nic.b
-    
+
     -- Health value display settings
     ns.c_healthValueFormat = db.healthValueFormat or "none"
     ns.c_healthValueFontSize = db.healthValueFontSize or 10
+    ns.c_nameTextYOffset = db.nameTextYOffset or 0
     ns.c_nameInHealthbar = db.nameInHealthbar == true  -- Default to false
     ns.c_hidePercentWhenFull = db.hidePercentWhenFull == true  -- Default to false (show 100%)
-    
+
     -- Friendly plate settings
     ns.c_friendlyNameOnly = db.friendlyNameOnly ~= false
     ns.c_liteHealthWhenDamaged = db.liteHealthWhenDamaged ~= false  -- true by default
@@ -379,24 +380,26 @@ function ns:UpdateDBCache()
     ns.c_friendlyFontSize = db.friendlyFontSize or 12
     ns.c_guildFontSize = db.guildFontSize or 10
     ns.c_npcTitleCache = db.npcTitleCache or {}
-    
+
     -- Combo point style (placeholder for future use)
     ns.c_cpStyle = db.cpStyle or 1
-    
+
     -- Name display format (none, abbreviate, first, last)
     ns.c_nameDisplayFormat = db.nameDisplayFormat or "none"
-    
+
     -- Target glow settings
     ns.c_targetGlow = db.targetGlow or "none"
     ns.c_targetArrow = db.targetArrow or "none"
     local tgc = db.targetGlowColor or { r = 1, g = 1, b = 1 }
     ns.c_targetGlowColor_r, ns.c_targetGlowColor_g, ns.c_targetGlowColor_b = tgc.r, tgc.g, tgc.b
-    
+    local mgc = db.mouseoverGlowColor or { r = 1, g = 1, b = 1 }
+    ns.c_mouseoverGlowColor_r, ns.c_mouseoverGlowColor_g, ns.c_mouseoverGlowColor_b = mgc.r, mgc.g, mgc.b
+
     -- PvP Targeting Me indicator settings
     ns.c_targetingMeIndicator = db.targetingMeIndicator or "disabled"
     local tmc = db.targetingMeColor or { r = 1, g = 0.2, b = 0.2 }
     ns.c_targetingMeColor_r, ns.c_targetingMeColor_g, ns.c_targetingMeColor_b = tmc.r, tmc.g, tmc.b
-    
+
     -- Quest objective icon settings
     ns.c_showQuestNPCs = db.showQuestNPCs ~= false        -- Default true
     ns.c_showQuestObjectives = db.showQuestObjectives ~= false  -- Default true
@@ -408,23 +411,27 @@ function ns:UpdateDBCache()
     ns.c_questIconX = db.questIconX or 0
     ns.c_questIconY = db.questIconY or 0
     ns.c_questIconsEnabled = ns.c_showQuestNPCs or ns.c_showQuestObjectives
-    
+
     -- Level indicator settings
     ns.c_levelMode = db.levelMode or "disabled"  -- disabled, enemies, all
     ns.c_playerLevel = UnitLevel("player")  -- Cache player level for comparison
-    
+
     -- Classification icon settings
-    ns.c_classificationAnchor = db.classificationAnchor or "disabled"
-    
+    ns.c_classificationStyle = db.classificationStyle or "default"
+    ns.c_classificationAnchor = db.classificationAnchor or "TOPLEFT"
+    ns.c_classificationX = db.classificationX or 0
+    ns.c_classificationY = db.classificationY or 0
+    ns.c_classificationSize = db.classificationSize or 18
+
     -- Threat text display settings
     ns.c_threatTextAnchor = db.threatTextAnchor or "disabled"
     ns.c_threatTextFontSize = db.threatTextFontSize or 10
     ns.c_threatTextOffsetX = db.threatTextOffsetX or 2
     ns.c_threatTextOffsetY = db.threatTextOffsetY or 0
-    
+
     -- Personal resource bar settings
     local personal = db.personal or ns.defaults.personal
-    
+
     -- Personal enabled: CVar is authoritative (synced with Interface settings)
     -- Read from CVar first, fall back to saved setting for initial load
     local cvarVal = GetCVar and GetCVar("nameplateShowPersonal")
@@ -439,7 +446,7 @@ function ns:UpdateDBCache()
         -- CVar doesn't exist yet (unlikely) - use saved setting
         ns.c_personalEnabled = personal.enabled == true
     end
-    
+
     ns.c_personalWidth = personal.width or 110
     ns.c_personalHeight = personal.height or 12
     ns.c_personalShowPower = personal.showPowerBar ~= false
@@ -465,32 +472,32 @@ function ns:UpdateDBCache()
     ns.c_personalDebuffYOffset = personal.debuffYOffset or 0
     ns.c_personalYOffset = personal.yOffset or 0
     ns.c_personalBorderStyle = personal.borderStyle or "removable"  -- removable, black, debuff, debuff_only, none
-    
+
     -- Sync CVar with cached value
     if SetCVar then
         SetCVar("nameplateShowPersonal", ns.c_personalEnabled and "1" or "0")
     end
-    
+
     -- Cache aura settings (defined in Auras.lua)
     if ns.CacheAuraSettings then
         ns:CacheAuraSettings()
     end
-    
+
     -- Cache TurboDebuffs settings
     if ns.CacheTurboDebuffsSettings then
         ns:CacheTurboDebuffsSettings()
     end
-    
+
     -- Update targeting me polling state (forward declared, may be nil at load time)
     if ns.UpdateTargetingMePolling then
         ns.UpdateTargetingMePolling()
     end
-    
+
     -- Update personal power event registration (forward declared, may be nil at load time)
     if ns.UpdatePersonalPowerEvents then
         ns.UpdatePersonalPowerEvents()
     end
-    
+
     -- Stacking settings (ratio-based, adapts to clickbox size)
     local stacking = db.stacking or ns.defaults.stacking
     local stackingDefaults = ns.defaults.stacking
@@ -506,27 +513,27 @@ function ns:UpdateDBCache()
     ns.c_stackingYSpaceRatio = stacking.ySpaceRatio or stackingDefaults.ySpaceRatio
     ns.c_stackingOriginPosRatio = stacking.originPosRatio or stackingDefaults.originPosRatio
     ns.c_stackingUpperBorder = stacking.upperBorder or stackingDefaults.upperBorder
-    
+
     -- Update stacking state (forward declared, may be nil at load time)
     if ns.UpdateStacking then
         ns.UpdateStacking()
     end
-    
+
     -- Refresh stacking config cache (in case settings changed while enabled)
     if ns.RefreshStackingConfig then
         ns.RefreshStackingConfig()
     end
-    
+
     -- Initialize tall boss fix (always-on, extends WorldFrame for tall boss visibility)
     if ns.InitTallBossFix then
         ns.InitTallBossFix()
     end
-    
+
     -- Update nameplate alphas with new settings
     if ns.UpdateNameplateAlphas then
-        ns.UpdateNameplateAlphas()
+        ns.UpdateNameplateAlphas("settings")
     end
-    
+
     -- Invalidate per-plate style caches so UpdatePlateStyle re-applies everything
     for unit, myPlate in pairs(ns.unitToPlate or {}) do
         if myPlate then
@@ -608,33 +615,34 @@ function ns:UpdateDBCache()
     end
 end
 
+local nameplateAlphaUpdateScheduled = false
+local function ScheduleNameplateAlphaUpdate()
+    if nameplateAlphaUpdateScheduled then return end
+    nameplateAlphaUpdateScheduled = true
+    C_Timer_After(0, function()
+        nameplateAlphaUpdateScheduled = false
+        if ns.UpdateNameplateAlphas then
+            ns.UpdateNameplateAlphas("retry")
+        end
+    end)
+end
+
 -- Update alpha for all nameplates based on target state
 -- Called on PLAYER_TARGET_CHANGED and when alpha settings change
-function ns.UpdateNameplateAlphas()
-    local shouldDim = ns.currentTargetGUID and ns.c_nonTargetAlpha and ns.c_nonTargetAlpha < 1
-    
+function ns.UpdateNameplateAlphas(reason)
     for nameplate in C_NamePlateManager.EnumerateActiveNamePlates() do
+        if nameplate._isLite and nameplate.liteContainer then
+            local parentAlpha = nameplate:GetAlpha()
+            local alpha = ns.ResolveNameplateAlpha(nameplate.liteContainer, parentAlpha, reason or "refresh", ScheduleNameplateAlphaUpdate)
+            if alpha ~= nameplate.liteContainer:GetAlpha() then
+                nameplate.liteContainer:SetAlpha(alpha)
+            end
+        end
+
         local myPlate = nameplate.myPlate
         if myPlate and not myPlate.isPlayer then
-            local alpha = 1.0
-            if shouldDim then
-                local isTarget = myPlate.cachedGUID == ns.currentTargetGUID
-                if not isTarget then
-                    alpha = ns.c_nonTargetAlpha
-                end
-            end
-            -- Combine with engine parent alpha (occlusion via nameplateIntersectOpacity)
             local parentAlpha = nameplate:GetAlpha()
-            if parentAlpha < alpha then
-                alpha = parentAlpha
-                myPlate._occluded = true
-            elseif myPlate._occluded then
-                myPlate._occluded = nil
-                myPlate._deoccluding = true
-                alpha = myPlate:GetAlpha()
-            elseif myPlate._deoccluding then
-                myPlate._deoccluding = nil
-            end
+            local alpha = ns.ResolveNameplateAlpha(myPlate, parentAlpha, reason or "refresh", ScheduleNameplateAlphaUpdate)
             if alpha ~= myPlate:GetAlpha() then
                 myPlate:SetAlpha(alpha)
             end
@@ -658,19 +666,19 @@ local UpdatePersonalPowerEvents
 local function UpdateArenaStatus()
     local inInstance, instanceType = IsInInstance()
     local wasInArena = inArena
-    
+
     inArena = inInstance and instanceType == "arena"
-    
+
     -- Reset arena names when leaving arena
     if wasInArena and not inArena then
         wipe(arenaNames)
     end
-    
+
     -- Update arena names when entering arena
     if not wasInArena and inArena then
         UpdateArenaNames()
     end
-    
+
     -- Update targeting me polling state (only polls in arena when enabled)
     if UpdateTargetingMePolling then
         UpdateTargetingMePolling()
@@ -698,14 +706,14 @@ end
 -- Uses direct UnitIsUnit comparison for reliability (cache may be stale)
 local function GetArenaNumber(unit)
     if not inArena or not ns.c_arenaNumbers then return nil end
-    
+
     -- Direct comparison - most reliable method
     for i = 1, 5 do
         if UnitIsUnit(unit, ARENA_UNITS[i]) then
             return i
         end
     end
-    
+
     -- Fallback to name cache if direct comparison fails
     local unitName = UnitName(unit)
     return unitName and arenaNames[unitName] or nil
@@ -715,10 +723,10 @@ end
 -- Returns true if all enemy player nameplates have arena numbers resolved
 local function RefreshArenaNumbers()
     if not inArena or not ns.c_arenaNumbers then return true end
-    
+
     local allResolved = true
     local hasEnemyPlates = false
-    
+
     for nameplate in C_NamePlateManager_EnumerateActiveNamePlates() do
         local unit = nameplate._unit
         -- Use nameplate.myPlate directly instead of unitToPlate lookup
@@ -739,7 +747,7 @@ local function RefreshArenaNumbers()
             end
         end
     end
-    
+
     -- If no enemy plates visible yet, keep trying
     return hasEnemyPlates and allResolved
 end
@@ -751,31 +759,31 @@ local arenaRefreshCount = 0
 local function ScheduleArenaNumberRefresh()
     if arenaRefreshTimer then return end  -- Already scheduled
     arenaRefreshCount = 0
-    
+
     -- Refresh every 0.5s until all numbers resolved (max 3 seconds)
     local function DoRefresh()
         if not inArena then
             arenaRefreshTimer = nil
             return
         end
-        
+
         arenaRefreshCount = arenaRefreshCount + 1
         UpdateArenaNames()
         local allResolved = RefreshArenaNumbers()
-        
+
         -- Stop early if all enemy nameplates have arena numbers
         if allResolved then
             arenaRefreshTimer = nil
             return
         end
-        
+
         if arenaRefreshCount < 6 then
             arenaRefreshTimer = C_Timer_After(0.5, DoRefresh)
         else
             arenaRefreshTimer = nil
         end
     end
-    
+
     arenaRefreshTimer = C_Timer_After(0.5, DoRefresh)
 end
 
@@ -842,11 +850,11 @@ end
 local function GetTotemIcon(unit)
     local name = UnitName(unit)
     if not name then return nil end
-    
+
     -- Try exact match first (includes previously cached ranked names)
     local icon = TotemNameToIcon[name]
     if icon then return icon end
-    
+
     -- Try with rank suffix stripped, then cache the result
     local baseName = StripRankSuffix(name)
     if baseName then
@@ -857,7 +865,7 @@ local function GetTotemIcon(unit)
             return icon
         end
     end
-    
+
     return nil
 end
 
@@ -927,7 +935,7 @@ local function GetCurrentPercentFormat(curStr, percentStr)
     return result
 end
 
--- Helper for deficit format - cached  
+-- Helper for deficit format - cached
 local function GetDeficitFormat(deficitStr)
     local key = "d|" .. deficitStr
     local cached = rawget(compositeCache, key)
@@ -980,13 +988,13 @@ local truncateCache = setmetatable({}, {
         else
             str = format("%d", value)
         end
-        
+
         -- Only cache if under limit
         if truncateCacheCount < TRUNCATE_CACHE_SIZE then
             rawset(t, value, str)
             truncateCacheCount = truncateCacheCount + 1
         end
-        
+
         return str
     end
 })
@@ -1031,16 +1039,16 @@ local function FormatHealthValue(current, max, healthFmt)
     if fmt == "none" or not current or not max then
         return ""
     end
-    
+
     local percentInt = floor((current / max) * 100 + 0.5)  -- Round to integer for cache lookup
     local deficit = max - current
     local atFullHealth = (current == max)
     local hideWhenFull = ns.c_hidePercentWhenFull  -- User setting (default false = show 100%)
-    
+
     -- Get cached strings
     local curStr = TruncateValue(current)
     local percentStr = percentCache[percentInt] or percentCache[100]  -- Clamp to cache range
-    
+
     if fmt == "current" then
         return curStr
     elseif fmt == "percent" then
@@ -1081,7 +1089,7 @@ local function FormatHealthValue(current, max, healthFmt)
         end
         return ""
     end
-    
+
     return ""
 end
 
@@ -1098,7 +1106,7 @@ local function EnsureComboPoints(myPlate, isPersonal)
     local currentStyle = ns.c_cpStyle or 1
     if myPlate.cps and myPlate.cpStyle == currentStyle then return end
     if not myPlate.hp then return end  -- Need hp for anchoring
-    
+
     -- Clean up existing combo points if style changed
     if myPlate.cps then
         -- Both styles now use Textures - clear with SetTexture(nil)
@@ -1113,17 +1121,17 @@ local function EnsureComboPoints(myPlate, isPersonal)
             myPlate.cpContainer = nil
         end
     end
-    
+
     myPlate.cps = {}
     myPlate.cpStyle = currentStyle
-    
+
     -- Create container frame for combo points
     -- Frame level +15 to ensure combo points draw above classification icon (+10)
     local cpContainer = CreateFrame("Frame", nil, myPlate)
     cpContainer:SetFrameLevel(myPlate:GetFrameLevel() + 15)
     cpContainer:EnableMouse(false)  -- Pass through clicks
     myPlate.cpContainer = cpContainer
-    
+
     local cpWidth = ns.c_cpSize
     local offsetX, offsetY
     if isPersonal then
@@ -1133,19 +1141,19 @@ local function EnsureComboPoints(myPlate, isPersonal)
         offsetX = ns.c_cpX
         offsetY = ns.c_cpY
     end
-    
+
     if currentStyle == 2 then
         -- ROUNDED STYLE (Kui-like)
         local spacing = 3
         local totalWidth = (cpWidth * MAX_CP) + (spacing * (MAX_CP - 1))
-        
+
         PixelUtil.SetSize(cpContainer, totalWidth, cpWidth, 1, 1)
         cpContainer:ClearAllPoints()
         PixelUtil.SetPoint(cpContainer, "BOTTOM", myPlate.hp, "TOP", offsetX, -1 + offsetY, 1, 1)
-        
+
         for i = 1, MAX_CP do
             local color = cpColors[i] or cpColors[5]
-            
+
             -- Main combo point texture
             local cp = cpContainer:CreateTexture(nil, "ARTWORK", nil, 2)
             cp:SetTexture(CP_ROUND_TEXTURE)
@@ -1154,7 +1162,7 @@ local function EnsureComboPoints(myPlate, isPersonal)
             PixelUtil.SetSize(cp, cpWidth, cpWidth, 1, 1)
             cp:Hide()
             myPlate.cps[i] = cp
-            
+
             -- Position absolutely from container to avoid staircase effect
             local xOffset = (i - 1) * (cpWidth + spacing)
             cp:SetPoint("LEFT", cpContainer, "LEFT", xOffset, 0)
@@ -1165,23 +1173,23 @@ local function EnsureComboPoints(myPlate, isPersonal)
         local cpHeight = 4
         local spacing = 4     -- 3px gap between bars
         local totalWidth = (cpWidth * MAX_CP) + (spacing * (MAX_CP - 1))
-        
+
         PixelUtil.SetSize(cpContainer, totalWidth, cpHeight, 1, 1)
         cpContainer:ClearAllPoints()
         PixelUtil.SetPoint(cpContainer, "BOTTOM", myPlate.hp, "TOP", offsetX, -1 + offsetY, 1, 1)
-        
+
         for i = 1, MAX_CP do
             -- Create simple texture for each combo point
             local bar = cpContainer:CreateTexture(nil, "ARTWORK")
             bar:SetTexture(texture)
-            
+
             -- Set color
             local color = cpColors[i] or cpColors[5]
             bar:SetVertexColor(color.r, color.g, color.b)
-            
+
             bar:Hide()
             myPlate.cps[i] = bar
-            
+
             -- Position absolutely from container to avoid staircase effect
             bar:ClearAllPoints()
             PixelUtil.SetSize(bar, cpWidth, cpHeight, 1, 1)
@@ -1192,14 +1200,24 @@ local function EnsureComboPoints(myPlate, isPersonal)
 end
 
 -- Create health bar on first use (upgrades lite plate to full plate)
+local function ApplyMouseoverGlowColor(highlight)
+    if not (highlight and highlight.texture) then return end
+    highlight.texture:SetVertexColor(
+        ns.c_mouseoverGlowColor_r or 1,
+        ns.c_mouseoverGlowColor_g or 1,
+        ns.c_mouseoverGlowColor_b or 1,
+        0.25
+    )
+end
+
 local function EnsureFullPlate(myPlate)
     if myPlate.hp then return end  -- Already has health bar
-    
+
     local hp = CreateFrame("StatusBar", nil, myPlate)
     PixelUtil.SetPoint(hp, "CENTER", myPlate, "CENTER", 0, -3, 1, 1)
     hp:EnableMouse(false)  -- Pass through clicks
     hp:Hide()  -- Start hidden
-    
+
     -- Set status bar texture FIRST so GetStatusBarTexture() works for absorb anchoring
     hp:SetStatusBarTexture(ns.c_texture)
 
@@ -1254,30 +1272,30 @@ local function EnsureFullPlate(myPlate)
     hp.overAbsorbGlow = overAbsorbGlow
 
     myPlate.hp = hp
-    
+
     -- Initialize cache values for UpdatePlateStyle
     myPlate._lastBgAlpha = ns.c_backgroundAlpha
     myPlate._lastWidth = ns.c_width
     myPlate._lastHpHeight = ns.c_hpHeight
-    
+
     -- MOUSEOVER HIGHLIGHT: Parent to hp (highlights healthbar only, not whole clickbox)
     -- Self-managing highlight frame with its own OnUpdate
     local highlight = CreateFrame("Frame", nil, hp)
     highlight:SetAllPoints(hp)
     highlight:SetFrameLevel(hp:GetFrameLevel() + 1)
     highlight:EnableMouse(false)
-    
+
     local highlightTexture = highlight:CreateTexture(nil, "OVERLAY")
     highlightTexture:SetTexture("Interface\\Buttons\\WHITE8X8")
-    highlightTexture:SetVertexColor(1, 1, 1, 0.25)
     highlightTexture:SetBlendMode("ADD")
     highlightTexture:SetAllPoints(highlight)
-    
+
     highlight.texture = highlightTexture
+    ApplyMouseoverGlowColor(highlight)
     highlight.unit = nil  -- Set when showing
     highlight.elapsed = 0
     highlight:Hide()
-    
+
     -- OnUpdate: hide when mouse leaves unit
     highlight:SetScript("OnUpdate", function(self, elapsed)
         self.elapsed = (self.elapsed or 0) + elapsed
@@ -1290,9 +1308,9 @@ local function EnsureFullPlate(myPlate)
             end
         end
     end)
-    
+
     myPlate.highlight = highlight
-    
+
     -- Create totem icon frame (parented to myPlate for auto show/hide)
     local totemIconFrame = CreateFrame("Frame", nil, myPlate)
     totemIconFrame:SetFrameLevel(myPlate:GetFrameLevel() - 1)  -- Below plate content
@@ -1300,15 +1318,15 @@ local function EnsureFullPlate(myPlate)
     PixelUtil.SetPoint(totemIconFrame, "CENTER", myPlate, "CENTER", 0, -10, 1, 1)
     totemIconFrame:EnableMouse(false)
     totemIconFrame:Hide()
-    
+
     -- Use BACKGROUND layer with low sublevel to render behind text
     local totemIcon = totemIconFrame:CreateTexture(nil, "BACKGROUND", nil, -8)
     totemIcon:SetAllPoints(totemIconFrame)
     totemIcon:SetTexCoord(0.08, 0.92, 0.08, 0.92)  -- 30% zoom to crop icon border
-    
+
     myPlate.totemIconFrame = totemIconFrame
     myPlate.totemIcon = totemIcon
-    
+
     -- Create raid icon (only needed for full plates) - use cached values
     local myRaidIcon = myPlate:CreateTexture(nil, "OVERLAY")
     PixelUtil.SetSize(myRaidIcon, ns.c_raidMarkerSize, ns.c_raidMarkerSize, 1, 1)
@@ -1326,16 +1344,16 @@ local function EnsureFullPlate(myPlate)
     myRaidIcon:SetTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcons")
     myRaidIcon:Hide()
     myPlate.raidIcon = myRaidIcon
-    
+
     -- Quest icon created on-demand by EnsureQuestIcon()
-    
+
     -- Re-anchor name based on nameInHealthbar setting
     myPlate.nameText:ClearAllPoints()
     if ns.c_nameInHealthbar then
         -- Inside healthbar: reparent to hp so it renders above statusbar fill
         myPlate.nameText:SetParent(hp)
         myPlate.nameText:SetDrawLayer("OVERLAY", 7)
-        PixelUtil.SetPoint(myPlate.nameText, "LEFT", hp, "LEFT", 4, 0, 1, 1)
+        PixelUtil.SetPoint(myPlate.nameText, "LEFT", hp, "LEFT", 4, ns.c_nameTextYOffset, 1, 1)
         myPlate.nameText:SetJustifyH("LEFT")
         -- Limit width and disable word wrap for ellipsis truncation
         myPlate.nameText:SetWidth(ns.c_width * 0.6)
@@ -1345,13 +1363,14 @@ local function EnsureFullPlate(myPlate)
         -- Above healthbar: parent to myPlate, centered
         myPlate.nameText:SetParent(myPlate)
         myPlate.nameText:SetDrawLayer("OVERLAY")
-        PixelUtil.SetPoint(myPlate.nameText, "BOTTOM", hp, "TOP", 0, 3, 1, 1)
+        PixelUtil.SetPoint(myPlate.nameText, "BOTTOM", hp, "TOP", 0, 2 + ns.c_nameTextYOffset, 1, 1)
         myPlate.nameText:SetJustifyH("CENTER")
         myPlate.nameText:SetWidth(0)  -- No width limit
         myPlate.nameText:SetWordWrap(true)
     end
     myPlate._lastNameInHealthbar = ns.c_nameInHealthbar
-    
+    myPlate._lastNameTextYOffset = ns.c_nameTextYOffset
+
     -- Create execute range indicator (vertical line on healthbar)
     local execIndicator = hp:CreateTexture(nil, "OVERLAY")
     execIndicator:SetTexture("Interface\\Buttons\\WHITE8X8")
@@ -1361,10 +1380,10 @@ local function EnsureFullPlate(myPlate)
     PixelUtil.SetPoint(execIndicator, "BOTTOM", hp, "BOTTOM", 0, 0, 1, 1)
     execIndicator:Hide()
     myPlate.execIndicator = execIndicator
-    
+
     -- Create health value text
     local healthText = hp:CreateFontString(nil, "OVERLAY")
-    healthText:SetFont(ns.c_font, ns.c_healthValueFontSize, ns.c_fontOutline)
+    ns:SetFontSafe(healthText, ns.c_font, ns.c_healthValueFontSize, ns.c_fontOutline)
     healthText:SetTextColor(1, 1, 1)
     healthText:SetJustifyV("MIDDLE")
     if ns.c_nameInHealthbar then
@@ -1379,25 +1398,25 @@ local function EnsureFullPlate(myPlate)
     end
     healthText:Hide()  -- Hidden by default, shown when format is not "none"
     myPlate.healthText = healthText
-    
+
     -- Create threat text (anchored dynamically based on setting)
     local threatText = myPlate:CreateFontString(nil, "OVERLAY")
-    threatText:SetFont(ns.c_font, ns.c_threatTextFontSize, ns.c_fontOutline)
+    ns:SetFontSafe(threatText, ns.c_font, ns.c_threatTextFontSize, ns.c_fontOutline)
     threatText:SetTextColor(1, 1, 1)
     threatText:SetJustifyH("CENTER")
     threatText:SetJustifyV("MIDDLE")
     threatText:Hide()
     myPlate.threatText = threatText
-    
+
     -- Create level text (right of name, matches name font)
     local levelText = myPlate:CreateFontString(nil, "OVERLAY")
-    levelText:SetFont(ns.c_font, ns.c_fontSize, ns.c_fontOutline)
+    ns:SetFontSafe(levelText, ns.c_font, ns.c_fontSize, ns.c_fontOutline)
     PixelUtil.SetPoint(levelText, "LEFT", myPlate.nameText, "RIGHT", 2, 0, 1, 1)
     levelText:SetJustifyH("LEFT")
     levelText:SetJustifyV("MIDDLE")
     levelText:Hide()
     myPlate.levelText = levelText
-    
+
     -- Create classification icon (elite/rare/boss indicator)
     -- Uses atlas textures - placed on separate frame with higher level to ensure it draws above border
     local classifyFrame = CreateFrame("Frame", nil, hp)
@@ -1411,7 +1430,7 @@ local function EnsureFullPlate(myPlate)
     classifyIcon:Hide()
     myPlate.classifyIcon = classifyIcon
     myPlate.classifyFrame = classifyFrame
-    
+
     -- Create target glow frame (border style - surrounds healthbar)
     local targetGlow = CreateFrame("Frame", nil, hp)
     PixelUtil.SetPoint(targetGlow, "TOPLEFT", hp, "TOPLEFT", -5, 5, 1, 1)
@@ -1437,7 +1456,7 @@ local function EnsureFullPlate(myPlate)
     -- Right arrow: points left (towards bar) - flipped horizontally
     targetArrows.right:SetTexCoord(1, 0, 0, 1)
     myPlate.targetArrows = targetArrows
-    
+
     -- Apply styles to new health bar (use PixelUtil for pixel-perfect dimensions)
     PixelUtil.SetWidth(hp, ns.c_width, 1)
     PixelUtil.SetHeight(hp, ns.c_hpHeight, 1)
@@ -1484,7 +1503,7 @@ ns.HERO_POWER_ORDERS = {
 local function EnsurePowerBar(myPlate)
     if myPlate.powerBar then return end
     if not myPlate.hp then return end
-    
+
     local power = CreateFrame("StatusBar", nil, myPlate)
     PixelUtil.SetPoint(power, "TOPLEFT", myPlate.hp, "BOTTOMLEFT", 0, -1, 1, 1)
     PixelUtil.SetPoint(power, "TOPRIGHT", myPlate.hp, "BOTTOMRIGHT", 0, -1, 1, 1)
@@ -1493,27 +1512,27 @@ local function EnsurePowerBar(myPlate)
     power:SetMinMaxValues(0, 100)
     power:SetValue(100)
     power:EnableMouse(false)
-    
+
     local bg = power:CreateTexture(nil, "BACKGROUND")
     bg:SetAllPoints(power)
     bg:SetTexture(0, 0, 0, ns.c_backgroundAlpha)
     power.bg = bg
-    
+
     -- Pixel-perfect 4-texture border
     local border = CreateTextureBorder(power, 1)
     power.border = border
-    
+
     -- Power text (fake-centered via LEFT+RIGHT span to avoid sub-pixel jitter)
     local powerText = power:CreateFontString(nil, "OVERLAY")
     PixelUtil.SetPoint(powerText, "LEFT", power, "LEFT", 0, 0, 1, 1)
     PixelUtil.SetPoint(powerText, "RIGHT", power, "RIGHT", 0, 0, 1, 1)
-    powerText:SetFont(ns.c_font, ns.c_fontSize - 2, ns.c_fontOutline)
+    ns:SetFontSafe(powerText, ns.c_font, ns.c_fontSize - 2, ns.c_fontOutline)
     powerText:SetTextColor(1, 1, 1)
     powerText:SetJustifyH("CENTER")
     powerText:SetJustifyV("MIDDLE")
     powerText:Hide()
     power.text = powerText
-    
+
     power:Hide()  -- Start hidden
     myPlate.powerBar = power
 end
@@ -1522,7 +1541,7 @@ end
 local function EnsureAdditionalPowerBar(myPlate)
     if myPlate.additionalPowerBar then return end
     if not myPlate.powerBar then return end
-    
+
     local addPower = CreateFrame("StatusBar", nil, myPlate)
     PixelUtil.SetPoint(addPower, "TOPLEFT", myPlate.powerBar, "BOTTOMLEFT", 0, -1, 1, 1)
     PixelUtil.SetPoint(addPower, "TOPRIGHT", myPlate.powerBar, "BOTTOMRIGHT", 0, -1, 1, 1)
@@ -1531,20 +1550,20 @@ local function EnsureAdditionalPowerBar(myPlate)
     addPower:SetMinMaxValues(0, 100)
     addPower:SetValue(100)
     addPower:EnableMouse(false)
-    
+
     -- Always mana color (blue)
     local manaColor = POWER_COLORS[0]
     addPower:SetStatusBarColor(manaColor.r, manaColor.g, manaColor.b)
-    
+
     local bg = addPower:CreateTexture(nil, "BACKGROUND")
     bg:SetAllPoints(addPower)
     bg:SetTexture(0, 0, 0, ns.c_backgroundAlpha)
     addPower.bg = bg
-    
+
     -- Pixel-perfect 4-texture border
     local border = CreateTextureBorder(addPower, 1)
     addPower.border = border
-    
+
     addPower:Hide()  -- Start hidden
     myPlate.additionalPowerBar = addPower
 end
@@ -1553,10 +1572,10 @@ end
 local function ShouldShowAdditionalPower()
     if not ns.c_personalShowAdditionalPower then return false end
     if not ns.c_personalShowPower then return false end
-    
+
     local currentPowerType = UnitPowerType("player")
     local maxMana = UnitPowerMax("player", ns.ADDITIONAL_POWER_INDEX)
-    
+
     -- Show if: current power is NOT mana AND player has a mana pool
     return currentPowerType ~= ns.ADDITIONAL_POWER_INDEX and maxMana > 0
 end
@@ -1564,20 +1583,20 @@ end
 -- Update additional power bar (mana for druids)
 local function UpdateAdditionalPowerBar(myPlate)
     if not myPlate.additionalPowerBar then return end
-    
+
     if not ShouldShowAdditionalPower() then
         myPlate.additionalPowerBar:Hide()
         return
     end
-    
+
     local mana = UnitPower("player", ns.ADDITIONAL_POWER_INDEX)
     local maxMana = UnitPowerMax("player", ns.ADDITIONAL_POWER_INDEX)
-    
+
     if maxMana == 0 then
         myPlate.additionalPowerBar:Hide()
         return
     end
-    
+
     myPlate.additionalPowerBar:SetMinMaxValues(0, maxMana)
     myPlate.additionalPowerBar:SetValue(mana)
     myPlate.additionalPowerBar:Show()
@@ -1590,7 +1609,7 @@ end
 -- Create a single HERO power bar (used for all 3)
 local function CreateHeroPowerBar(myPlate, powerType, index, anchor)
     local height = ns.c_personalPowerHeight
-    
+
     local bar = CreateFrame("StatusBar", nil, myPlate)
     bar:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 0, -1)
     bar:SetPoint("TOPRIGHT", anchor, "BOTTOMRIGHT", 0, -1)
@@ -1601,29 +1620,29 @@ local function CreateHeroPowerBar(myPlate, powerType, index, anchor)
     bar:EnableMouse(false)
     bar.powerType = powerType
     bar.index = index
-    
+
     local color = ns.POWER_COLORS[powerType] or ns.POWER_COLORS[0]
     bar:SetStatusBarColor(color.r, color.g, color.b)
-    
+
     local bg = bar:CreateTexture(nil, "BACKGROUND")
     bg:SetAllPoints(bar)
     bg:SetTexture(0, 0, 0, ns.c_backgroundAlpha)
     bar.bg = bg
-    
+
     local border = CreateTextureBorder(bar, 1)
     bar.border = border
-    
+
     local text = bar:CreateFontString(nil, "OVERLAY")
     text:SetPoint("LEFT", bar, "LEFT", 0, 0)
     text:SetPoint("RIGHT", bar, "RIGHT", 0, 0)
     local powerFontSize = max(ns.c_fontSize - 2, 6)
-    text:SetFont(ns.c_font, powerFontSize, ns.c_fontOutline)
+    ns:SetFontSafe(text, ns.c_font, powerFontSize, ns.c_fontOutline)
     text:SetTextColor(1, 1, 1)
     text:SetJustifyH("CENTER")
     text:SetJustifyV("MIDDLE")
     text:Hide()
     bar.text = text
-    
+
     bar:Hide()
     return bar
 end
@@ -1632,7 +1651,7 @@ end
 local function PositionHeroPowerBars(myPlate)
     if not myPlate.heroPowerBars or not myPlate.hp then return end
     local height = ns.c_personalPowerHeight
-    
+
     for i = 1, 3 do
         local bar = myPlate.heroPowerBars[i]
         if bar then
@@ -1649,10 +1668,10 @@ end
 local function EnsureHeroPowerBars(myPlate)
     if myPlate.heroPowerBars then return end
     if not myPlate.hp then return end
-    
+
     myPlate.heroPowerBars = {}
     local order = ns.HERO_POWER_ORDERS[ns.c_personalHeroPowerOrder] or ns.HERO_POWER_ORDERS[1]
-    
+
     local anchor = myPlate.hp
     for i = 1, 3 do
         local bar = CreateHeroPowerBar(myPlate, order[i], i, anchor)
@@ -1664,20 +1683,20 @@ end
 -- Update a single HERO power bar
 local function UpdateSingleHeroPowerBar(bar)
     if not bar then return end
-    
+
     local powerType = bar.powerType
     local power = UnitPower("player", powerType)
     local maxPower = UnitPowerMax("player", powerType)
-    
+
     if maxPower == 0 then
         bar:Hide()
         if bar.text then bar.text:Hide() end
         return false
     end
-    
+
     bar:SetMinMaxValues(0, maxPower)
     bar:SetValue(power)
-    
+
     -- Update text using same format as standard power bar
     if bar.text then
         local powerFmt = ns.c_personalPowerFormat
@@ -1689,7 +1708,7 @@ local function UpdateSingleHeroPowerBar(bar)
             local atFullPower = (power == maxPower)
             local hideWhenFull = ns.c_hidePercentWhenFull
             local curStr = TruncateValue(power)
-            
+
             if powerFmt == "current" then
                 text = curStr
             elseif powerFmt == "percent" then
@@ -1737,7 +1756,7 @@ local function UpdateSingleHeroPowerBar(bar)
                     end
                 end
             end
-            
+
             if text ~= "" then
                 bar.text:SetText(text)
                 bar.text:Show()
@@ -1748,7 +1767,7 @@ local function UpdateSingleHeroPowerBar(bar)
             bar.text:Hide()
         end
     end
-    
+
     bar:Show()
     return true
 end
@@ -1764,7 +1783,7 @@ local function UpdateHeroPowerBars(myPlate)
         end
         return
     end
-    
+
     for i = 1, 3 do
         UpdateSingleHeroPowerBar(myPlate.heroPowerBars[i])
     end
@@ -1773,9 +1792,9 @@ end
 -- Reorder HERO power bars when setting changes
 local function ReorderHeroPowerBars(myPlate)
     if not myPlate.heroPowerBars then return end
-    
+
     local order = ns.HERO_POWER_ORDERS[ns.c_personalHeroPowerOrder] or ns.HERO_POWER_ORDERS[1]
-    
+
     for i = 1, 3 do
         local bar = myPlate.heroPowerBars[i]
         if bar then
@@ -1784,7 +1803,7 @@ local function ReorderHeroPowerBars(myPlate)
             bar:SetStatusBarColor(color.r, color.g, color.b)
         end
     end
-    
+
     PositionHeroPowerBars(myPlate)
 end
 
@@ -1800,7 +1819,7 @@ local function UpdatePowerBar(myPlate, unit)
         -- Hide standard power bar for HERO
         if myPlate.powerBar then myPlate.powerBar:Hide() end
         if myPlate.additionalPowerBar then myPlate.additionalPowerBar:Hide() end
-        
+
         -- Hero bars only on personal plate
         if not myPlate.isPlayer then
             if myPlate.heroPowerBars then
@@ -1812,7 +1831,7 @@ local function UpdatePowerBar(myPlate, unit)
             end
             return
         end
-        
+
         if not ns.c_personalShowPower then
             if myPlate.heroPowerBars then
                 for i = 1, 3 do
@@ -1823,7 +1842,7 @@ local function UpdatePowerBar(myPlate, unit)
             end
             return
         end
-        
+
         -- Ensure HERO bars exist and update them
         local wasNew = not myPlate.heroPowerBars
         EnsureHeroPowerBars(myPlate)
@@ -1833,7 +1852,7 @@ local function UpdatePowerBar(myPlate, unit)
         end
         return
     end
-    
+
     -- Standard power bar logic for non-HERO classes
     if not myPlate.powerBar then return end
     if not ns.c_personalShowPower then
@@ -1841,19 +1860,19 @@ local function UpdatePowerBar(myPlate, unit)
         if myPlate.additionalPowerBar then myPlate.additionalPowerBar:Hide() end
         return
     end
-    
+
     local powerType = UnitPowerType(unit)
     local power = UnitPower(unit)
     local maxPower = UnitPowerMax(unit)
-    
+
     if maxPower == 0 then
         myPlate.powerBar:Hide()
         return
     end
-    
+
     myPlate.powerBar:SetMinMaxValues(0, maxPower)
     myPlate.powerBar:SetValue(power)
-    
+
     -- Color by power type
     if ns.c_personalPowerColorByType then
         local color = POWER_COLORS[powerType] or POWER_COLORS[0]
@@ -1861,7 +1880,7 @@ local function UpdatePowerBar(myPlate, unit)
     else
         myPlate.powerBar:SetStatusBarColor(0, 0.5, 1)  -- Default blue
     end
-    
+
     -- Update power text if format is set
     -- Uses cached percent strings
     local powerFmt = ns.c_personalPowerFormat
@@ -1872,9 +1891,9 @@ local function UpdatePowerBar(myPlate, unit)
         local deficit = maxPower - power
         local atFullPower = (power == maxPower)
         local hideWhenFull = ns.c_hidePercentWhenFull  -- User setting (default false = show 100%)
-        
+
         local curStr = TruncateValue(power)
-        
+
         if powerFmt == "current" then
             text = curStr
         elseif powerFmt == "percent" then
@@ -1922,7 +1941,7 @@ local function UpdatePowerBar(myPlate, unit)
                 end
             end
         end
-        
+
         if text ~= "" then
             myPlate.powerBar.text:SetText(text)
             myPlate.powerBar.text:Show()
@@ -1932,9 +1951,9 @@ local function UpdatePowerBar(myPlate, unit)
     else
         myPlate.powerBar.text:Hide()
     end
-    
+
     myPlate.powerBar:Show()
-    
+
     -- Update additional power bar (druid mana)
     if myPlate.additionalPowerBar or ShouldShowAdditionalPower() then
         local wasNew = not myPlate.additionalPowerBar
@@ -1962,17 +1981,17 @@ local function EnsureCastbar(myPlate)
             local iconSize = ns.c_castHeight
             local showIcon = ns.c_showCastIcon
             local castbarWidth = showIcon and (ns.c_width - iconSize - 2) or ns.c_width
-            
+
             PixelUtil.SetWidth(myPlate.castbar, castbarWidth, 1)
             PixelUtil.SetHeight(myPlate.castbar, ns.c_castHeight, 1)
             myPlate.castbar:SetStatusBarTexture(ns.c_texture)
             myPlate.castbar:ClearAllPoints()
-            
+
             -- Update spark size based on castbar height
             if myPlate.castbar.spark then
                 PixelUtil.SetSize(myPlate.castbar.spark, 16, ns.c_castHeight * 2, 1, 1)
             end
-            
+
             if showIcon then
                 PixelUtil.SetPoint(myPlate.castbar, "TOPLEFT", myPlate.hp, "BOTTOMLEFT", iconSize + 2, -2, 1, 1)
                 -- Position and size icon
@@ -2050,18 +2069,18 @@ local function UpdatePersonalComboPoints()
         end
         return
     end
-    
+
     if not personalPlateRef then return end
-    
+
     -- Ensure combo points exist on personal plate (true = personal mode)
     EnsureComboPoints(personalPlateRef, true)
-    
+
     if not personalPlateRef.cps then return end
-    
+
     -- Get current combo points (works even without target if player has points stored)
     local points = GetComboPoints("player", "target") or 0
     local numCPs = #personalPlateRef.cps
-    
+
     for i = 1, numCPs do
         if i <= points then
             personalPlateRef.cps[i]:Show()
@@ -2121,11 +2140,11 @@ local function GetPlayerDebuffType(onlyRemovable)
     local priorities = ns.CLASS_DEBUFF_PRIORITIES[ns.playerClassForDebuffs] or ns.DEFAULT_PRIORITIES
     local removable = ns.CLASS_REMOVABLE[ns.playerClassForDebuffs] or {}
     local currentPriority = 0
-    
+
     for i = 1, 40 do
         local name, _, _, _, debuffType = UnitDebuff("player", i)
         if not name then break end  -- No more debuffs
-        
+
         if debuffType then
             -- If onlyRemovable mode, skip non-removable types for this class
             if onlyRemovable and not removable[debuffType] then
@@ -2141,7 +2160,7 @@ local function GetPlayerDebuffType(onlyRemovable)
         end
         -- Physical/none debuffs are intentionally ignored for border coloring
     end
-    
+
     return hasDebuff, highestPriority
 end
 
@@ -2149,11 +2168,11 @@ end
 -- Handles hp, power, additionalPower, and HERO power bars together
 function ns:UpdatePersonalBorder()
     if not personalPlateRef then return end
-    
+
     local hpBorder = personalPlateRef.hp and personalPlateRef.hp.border
     local powerBorder = personalPlateRef.powerBar and personalPlateRef.powerBar.border
     local addPowerBorder = personalPlateRef.additionalPowerBar and personalPlateRef.additionalPowerBar.border
-    
+
     -- HERO class power bar borders
     local heroBorders = {}
     if personalPlateRef.heroPowerBars then
@@ -2163,9 +2182,9 @@ function ns:UpdatePersonalBorder()
             end
         end
     end
-    
+
     local style = ns.c_personalBorderStyle
-    
+
     -- Determine if tight spacing is needed (no visible borders)
     -- True for "none" always, and for "debuff_only" when no debuff
     local hideBorders = false
@@ -2175,7 +2194,7 @@ function ns:UpdatePersonalBorder()
         local _, debuffType = GetPlayerDebuffType(false)
         hideBorders = not debuffType
     end
-    
+
     -- Helper to show all borders with a color
     local function ShowAllBorders(r, g, b)
         if hpBorder then
@@ -2205,7 +2224,7 @@ function ns:UpdatePersonalBorder()
             end
         end
     end
-    
+
     -- Helper to hide all borders
     local function HideAllBorders()
         if hpBorder then hpBorder:Hide() end
@@ -2215,7 +2234,7 @@ function ns:UpdatePersonalBorder()
             if heroBorders[i] then heroBorders[i]:Hide() end
         end
     end
-    
+
     -- Adjust bar spacing based on border visibility
     -- When borders are hidden, reduce the gap between bars
     if personalPlateRef.powerBar and personalPlateRef.hp then
@@ -2256,7 +2275,7 @@ function ns:UpdatePersonalBorder()
             end
         end
     end
-    
+
     if style == "none" then
         -- No borders at all
         HideAllBorders()
@@ -2309,17 +2328,17 @@ end
 local function UpdateTargetGlow(myPlate, isTarget)
     -- Skip target glow on personal plate (player doesn't need target indicator on themselves)
     if myPlate.isPlayer then return end
-    
+
     local glowStyle = ns.c_targetGlow
     local arrowStyle = ns.c_targetArrow
-    
+
     -- Hide all glow elements first
     if myPlate.targetGlow then myPlate.targetGlow:Hide() end
     if myPlate.targetArrows then
         myPlate.targetArrows.left:Hide()
         myPlate.targetArrows.right:Hide()
     end
-    if myPlate.thickOutline then 
+    if myPlate.thickOutline then
         myPlate.thickOutline:Hide()
         -- Hide both cached borders
         if myPlate.thickOutline.borders then
@@ -2327,7 +2346,7 @@ local function UpdateTargetGlow(myPlate, isTarget)
             if myPlate.thickOutline.borders.thin then myPlate.thickOutline.borders.thin:Hide() end
         end
     end
-    
+
     if not isTarget then
         return
     end
@@ -2378,14 +2397,14 @@ local function UpdateTargetGlow(myPlate, isTarget)
             arrows.right:Show()
         end
     end
-    
+
     -- Show glow/border if enabled (independent of arrows)
     if glowStyle == "thick" or glowStyle == "thin" then
         -- Thick/Thin outline: solid colored border around healthbar (pixel-perfect texture-based)
         -- Positioned OUTSIDE the existing 1px black hp.border
         local thickness = (glowStyle == "thick") and 3 or 1.5
         local innerOffset = 1  -- Account for hp's 1px black border
-        
+
         if not myPlate.thickOutline then
             -- Create container frame for the border (created once per plate)
             local outline = CreateFrame("Frame", nil, myPlate.hp)
@@ -2394,60 +2413,60 @@ local function UpdateTargetGlow(myPlate, isTarget)
             outline.borders = {}  -- Cache for thick/thin borders
             myPlate.thickOutline = outline
         end
-        
+
         local outline = myPlate.thickOutline
         local borderKey = glowStyle  -- "thick" or "thin" as cache key
         local currentScale = myPlate.hp:GetEffectiveScale()
-        
+
         -- Invalidate cache if scale changed (prevents stale pixel sizes)
         if outline._lastScale and outline._lastScale ~= currentScale then
             outline.borders = {}
             outline._lastScale = nil
         end
-        
+
         -- Use cached border or create new one (each thickness created only once)
         if not outline.borders[borderKey] then
             -- Create border positioned outside the existing 1px hp.border
             local pixelSize = PixelUtil.GetNearestPixelSize(thickness, myPlate.hp:GetEffectiveScale(), 1)
             local offsetSize = PixelUtil.GetNearestPixelSize(innerOffset, myPlate.hp:GetEffectiveScale(), 1)
             local totalOffset = pixelSize + offsetSize  -- Border extends outside the 1px black border
-            
+
             local border = setmetatable({}, ns.BorderMethods)
-            
+
             border.top = myPlate.hp:CreateTexture(nil, "BORDER")
             border.top:SetTexture(ns.BORDER_TEX)
             border.top:SetPoint("TOPLEFT", myPlate.hp, "TOPLEFT", -totalOffset, totalOffset)
             border.top:SetPoint("TOPRIGHT", myPlate.hp, "TOPRIGHT", totalOffset, totalOffset)
             PixelUtil.SetHeight(border.top, pixelSize, 1)
-            
+
             border.bottom = myPlate.hp:CreateTexture(nil, "BORDER")
             border.bottom:SetTexture(ns.BORDER_TEX)
             border.bottom:SetPoint("BOTTOMLEFT", myPlate.hp, "BOTTOMLEFT", -totalOffset, -totalOffset)
             border.bottom:SetPoint("BOTTOMRIGHT", myPlate.hp, "BOTTOMRIGHT", totalOffset, -totalOffset)
             PixelUtil.SetHeight(border.bottom, pixelSize, 1)
-            
+
             border.left = myPlate.hp:CreateTexture(nil, "BORDER")
             border.left:SetTexture(ns.BORDER_TEX)
             border.left:SetPoint("TOPLEFT", myPlate.hp, "TOPLEFT", -totalOffset, offsetSize)
             border.left:SetPoint("BOTTOMLEFT", myPlate.hp, "BOTTOMLEFT", -totalOffset, -offsetSize)
             PixelUtil.SetWidth(border.left, pixelSize, 1)
-            
+
             border.right = myPlate.hp:CreateTexture(nil, "BORDER")
             border.right:SetTexture(ns.BORDER_TEX)
             border.right:SetPoint("TOPRIGHT", myPlate.hp, "TOPRIGHT", totalOffset, offsetSize)
             border.right:SetPoint("BOTTOMRIGHT", myPlate.hp, "BOTTOMRIGHT", totalOffset, -offsetSize)
             PixelUtil.SetWidth(border.right, pixelSize, 1)
-            
+
             outline.borders[borderKey] = border
             outline._lastScale = currentScale
         end
-        
+
         -- Hide the other thickness if shown
         local otherKey = (borderKey == "thick") and "thin" or "thick"
         if outline.borders[otherKey] then
             outline.borders[otherKey]:Hide()
         end
-        
+
         -- Show and color the active border (forceAlpha to allow full brightness)
         local border = outline.borders[borderKey]
         border:SetColor(
@@ -2463,7 +2482,7 @@ local function UpdateTargetGlow(myPlate, isTarget)
         -- Border glow style: glow surrounding the healthbar
         if not myPlate.targetGlow then return end
         local glow = myPlate.targetGlow
-        
+
         glow:ClearAllPoints()
         glow:SetPoint("TOPLEFT", myPlate.hp, "TOPLEFT", -5, 5)
         glow:SetPoint("BOTTOMRIGHT", myPlate.hp, "BOTTOMRIGHT", 5, -5)
@@ -2505,7 +2524,7 @@ end
 local function EnsureTargetingMeGlow(myPlate)
     if myPlate.targetingMeGlow then return end
     if not myPlate.hp then return end
-    
+
     local glow = CreateFrame("Frame", nil, myPlate.hp)
     glow:SetPoint("TOPLEFT", myPlate.hp, "TOPLEFT", -5, 5)
     glow:SetPoint("BOTTOMRIGHT", myPlate.hp, "BOTTOMRIGHT", 5, -5)
@@ -2526,7 +2545,7 @@ local UpdateColor
 -- Update the visual indicator for "targeting me" state
 local function UpdateTargetingMeVisual(myPlate, isTargetingMe)
     if not myPlate or not myPlate.hp then return end
-    
+
     local indicator = ns.c_targetingMeIndicator
     if indicator == "disabled" then
         -- Clean up any active indicators
@@ -2551,9 +2570,9 @@ local function UpdateTargetingMeVisual(myPlate, isTargetingMe)
         end
         return
     end
-    
+
     local r, g, b = ns.c_targetingMeColor_r, ns.c_targetingMeColor_g, ns.c_targetingMeColor_b
-    
+
     if isTargetingMe then
         -- Store original colors if not already stored
         if not myPlate._targetingMeActive then
@@ -2568,7 +2587,7 @@ local function UpdateTargetingMeVisual(myPlate, isTargetingMe)
             end
         end
         myPlate._targetingMeActive = true
-        
+
         if indicator == "glow" then
             -- Glow highlight around health bar
             EnsureTargetingMeGlow(myPlate)
@@ -2608,7 +2627,7 @@ local function UpdateTargetingMeVisual(myPlate, isTargetingMe)
             myPlate._targetingMeActive = nil
             originalColors[myPlate] = nil
         end
-        
+
         -- Reset border to user's setting (respect disabled state)
         if myPlate.hp and myPlate.hp.border then
             myPlate.hp.border:SetColor(0, 0, 0, BORDER_ALPHA)
@@ -2616,7 +2635,7 @@ local function UpdateTargetingMeVisual(myPlate, isTargetingMe)
                 myPlate.hp.border:Hide()
             end
         end
-        
+
         -- Always hide glow when not targeting
         if myPlate.targetingMeGlow then
             myPlate.targetingMeGlow:Hide()
@@ -2648,7 +2667,7 @@ end
 local function UpdateAllTargetingMe()
     if not inArena then return end
     if ns.c_targetingMeIndicator == "disabled" then return end
-    
+
     for unit, myPlate in pairs(ns.unitToPlate) do
         -- Skip friendly nameplates (targeting me is hostile-only)
         if UnitIsFriend("player", unit) then
@@ -2662,7 +2681,7 @@ local function UpdateAllTargetingMe()
             local unitName = UnitName(unit)
             local arenaNum = GetArenaNumberTargetingMe(unitName)
             local isTargetingMe = arenaNum ~= nil
-            
+
             if myPlate.isTargetingMe ~= isTargetingMe then
                 myPlate.isTargetingMe = isTargetingMe
                 UpdateTargetingMeVisual(myPlate, isTargetingMe)
@@ -2683,7 +2702,7 @@ local function GetTargetingMeThrottle() return THROTTLE.targetingMe * (ns.c_thro
 UpdateTargetingMePolling = function()
     -- Only active in arena (arena unit tokens work, nameplate tokens don't)
     local shouldPoll = inArena and ns.c_targetingMeIndicator ~= "disabled"
-    
+
     if shouldPoll then
         targetingMeElapsed = 0  -- Reset throttle when re-enabling
         targetingMeFrame:Show()
@@ -2705,7 +2724,7 @@ targetingMeFrame:SetScript("OnUpdate", function(self, delta)
     targetingMeElapsed = targetingMeElapsed + delta
     if targetingMeElapsed < GetTargetingMeThrottle() then return end
     targetingMeElapsed = 0
-    
+
     UpdateAllTargetingMe()
 end)
 
@@ -2715,8 +2734,6 @@ targetingMeFrame:Hide()
 -- Expose for external use
 ns.UpdateAllTargetingMe = UpdateAllTargetingMe
 ns.UpdateTargetingMePolling = UpdateTargetingMePolling
-
--- ============================================================================
 
 function ns:UpdatePlateStyle(myPlate)
     -- Only style health bar if it exists
@@ -2730,10 +2747,10 @@ function ns:UpdatePlateStyle(myPlate)
                 myPlate._lastHpHeight = ns.c_hpHeight
             end
         end
-        
+
         -- Always apply texture (no caching - SetStatusBarTexture is cheap)
         myPlate.hp:SetStatusBarTexture(ns.c_texture)
-        
+
         -- Update background alpha
         if myPlate.hp.bg and myPlate._lastBgAlpha ~= ns.c_backgroundAlpha then
             myPlate.hp.bg:SetTexture(0, 0, 0, ns.c_backgroundAlpha)
@@ -2746,7 +2763,7 @@ function ns:UpdatePlateStyle(myPlate)
             end
             myPlate._lastBgAlpha = ns.c_backgroundAlpha
         end
-        
+
         -- Toggle healthbar border visibility (personal has own border via UpdatePersonalBorder)
         if not myPlate.isPlayer and myPlate.hp.border then
             local showBorder = ns.c_healthBarBorder
@@ -2758,7 +2775,7 @@ function ns:UpdatePlateStyle(myPlate)
                 end
                 myPlate._lastBorderShown = showBorder
             end
-            
+
             -- Update border scale when UI scale changes
             local currentScale = myPlate.hp:GetEffectiveScale()
             if myPlate._lastBorderScale ~= currentScale then
@@ -2767,6 +2784,8 @@ function ns:UpdatePlateStyle(myPlate)
             end
         end
     end
+
+    ApplyMouseoverGlowColor(myPlate.highlight)
 
     -- Personal plate settings (comprehensive update when options change)
     if myPlate.isPlayer and myPlate.hp then
@@ -2781,20 +2800,20 @@ function ns:UpdatePlateStyle(myPlate)
             PixelUtil.SetHeight(myPlate.hp, personalHeight, 1)
             myPlate._lastPersonalHeight = personalHeight
         end
-        
+
         -- Health bar Y offset
         if myPlate._lastPersonalY ~= ns.c_personalYOffset then
             myPlate.hp:ClearAllPoints()
             myPlate.hp:SetPoint("CENTER", myPlate, "CENTER", 0, ns.c_personalYOffset)
             myPlate._lastPersonalY = ns.c_personalYOffset
         end
-        
+
         -- Health bar texture
         if myPlate._lastPersonalTexture ~= ns.c_texture then
             myPlate.hp:SetStatusBarTexture(ns.c_texture)
             myPlate._lastPersonalTexture = ns.c_texture
         end
-        
+
         -- Health bar color (apply class color or user-defined color)
         if not ns.c_personalUseClassColor then
             local r = ns.c_personalHealthColor_r or 0
@@ -2802,17 +2821,17 @@ function ns:UpdatePlateStyle(myPlate)
             local b = ns.c_personalHealthColor_b or 0
             myPlate.hp:SetStatusBarColor(r, g, b)
         end
-        
+
         -- Health text font
         if myPlate.healthText then
             local healthFontSize = ns.c_healthValueFontSize
             if myPlate._lastPersonalHealthFont ~= ns.c_font or myPlate._lastPersonalHealthFontSize ~= healthFontSize or myPlate._lastPersonalHealthFontOutline ~= ns.c_fontOutline then
-                myPlate.healthText:SetFont(ns.c_font, healthFontSize, ns.c_fontOutline)
+                ns:SetFontSafe(myPlate.healthText, ns.c_font, healthFontSize, ns.c_fontOutline)
                 myPlate._lastPersonalHealthFont = ns.c_font
                 myPlate._lastPersonalHealthFontSize = healthFontSize
                 myPlate._lastPersonalHealthFontOutline = ns.c_fontOutline
             end
-            
+
             -- Health text format (show/hide based on format setting)
             local healthFmt = ns.c_personalHealthFormat
             if healthFmt and healthFmt ~= "none" then
@@ -2825,7 +2844,7 @@ function ns:UpdatePlateStyle(myPlate)
                 myPlate.healthText:Hide()
             end
         end
-        
+
         -- Power bar
         if ns.c_personalShowPower then
             EnsurePowerBar(myPlate)
@@ -2843,22 +2862,22 @@ function ns:UpdatePlateStyle(myPlate)
                     myPlate.powerBar:SetStatusBarTexture(ns.c_texture)
                     myPlate.powerBar._lastTexture = ns.c_texture
                 end
-                
+
                 -- Power text font
                 if myPlate.powerBar.text then
                     local powerFontSize = ns.c_healthValueFontSize - 2
                     if myPlate.powerBar._lastFontSize ~= powerFontSize or myPlate.powerBar._lastFont ~= ns.c_font or myPlate.powerBar._lastFontOutline ~= ns.c_fontOutline then
-                        myPlate.powerBar.text:SetFont(ns.c_font, powerFontSize, ns.c_fontOutline)
+                        ns:SetFontSafe(myPlate.powerBar.text, ns.c_font, powerFontSize, ns.c_fontOutline)
                         myPlate.powerBar._lastFont = ns.c_font
                         myPlate.powerBar._lastFontSize = powerFontSize
                         myPlate.powerBar._lastFontOutline = ns.c_fontOutline
                     end
                 end
-                
+
                 -- Show and update values
                 UpdatePowerBar(myPlate, "player")
             end
-            
+
             -- Additional power bar (druid mana)
             if myPlate.additionalPowerBar then
                 if myPlate.additionalPowerBar._lastWidth ~= personalWidth then
@@ -2870,7 +2889,7 @@ function ns:UpdatePlateStyle(myPlate)
                     myPlate.additionalPowerBar._lastHeight = ns.c_personalAdditionalPowerHeight
                 end
             end
-            
+
             -- HERO class power bars (mana, energy, rage)
             if myPlate.heroPowerBars then
                 local powerFontSize = max(ns.c_healthValueFontSize - 2, 6)
@@ -2890,7 +2909,7 @@ function ns:UpdatePlateStyle(myPlate)
                         -- Text font
                         if bar.text then
                             if bar._lastFont ~= ns.c_font or bar._lastFontSize ~= powerFontSize or bar._lastFontOutline ~= ns.c_fontOutline then
-                                bar.text:SetFont(ns.c_font, powerFontSize, ns.c_fontOutline)
+                                ns:SetFontSafe(bar.text, ns.c_font, powerFontSize, ns.c_fontOutline)
                                 bar._lastFont = ns.c_font
                                 bar._lastFontSize = powerFontSize
                                 bar._lastFontOutline = ns.c_fontOutline
@@ -2918,12 +2937,12 @@ function ns:UpdatePlateStyle(myPlate)
                 end
             end
         end
-        
+
         -- Update border style
         if ns.UpdatePersonalBorder then
             ns:UpdatePersonalBorder()
         end
-        
+
         -- Update personal plate border scales when UI scale changes
         local currentScale = myPlate.hp:GetEffectiveScale()
         if myPlate._lastBorderScale ~= currentScale then
@@ -2947,38 +2966,38 @@ function ns:UpdatePlateStyle(myPlate)
             end
             myPlate._lastBorderScale = currentScale
         end
-        
+
         -- Update aura positions (buff/debuff Y offsets)
         if ns.UpdateAuraPositions then
             ns:UpdateAuraPositions(myPlate)
         end
-        
+
         -- Note: Buff/debuff visibility is handled in UpdateAuras called from FullPlateUpdate
     end
 
     -- Cache font settings (name text, guild text, level text use same cache)
     if myPlate._lastFont ~= ns.c_font or myPlate._lastFontSize ~= ns.c_fontSize or myPlate._lastFontOutline ~= ns.c_fontOutline then
-        myPlate.nameText:SetFont(ns.c_font, ns.c_fontSize, ns.c_fontOutline)
+        ns:SetFontSafe(myPlate.nameText, ns.c_font, ns.c_fontSize, ns.c_fontOutline)
         if myPlate.guildText then
-            myPlate.guildText:SetFont(ns.c_font, math_max(ns.c_fontSize - 2, 8), ns.c_fontOutline)
+            ns:SetFontSafe(myPlate.guildText, ns.c_font, math_max(ns.c_fontSize - 2, 8), ns.c_fontOutline)
         end
         if myPlate.levelText then
-            myPlate.levelText:SetFont(ns.c_font, ns.c_fontSize, ns.c_fontOutline)
+            ns:SetFontSafe(myPlate.levelText, ns.c_font, ns.c_fontSize, ns.c_fontOutline)
         end
         myPlate._lastFont = ns.c_font
         myPlate._lastFontSize = ns.c_fontSize
         myPlate._lastFontOutline = ns.c_fontOutline
     end
-    
+
     -- Update nameText and healthText positions when nameInHealthbar changes
     -- Skip totem plates (they use custom layout, restored via _wasTotem on next non-totem use)
-    if not myPlate.isPlayer and not myPlate._wasTotem and myPlate._lastNameInHealthbar ~= ns.c_nameInHealthbar then
+    if not myPlate.isPlayer and not myPlate._wasTotem and (myPlate._lastNameInHealthbar ~= ns.c_nameInHealthbar or myPlate._lastNameTextYOffset ~= ns.c_nameTextYOffset) then
         myPlate.nameText:ClearAllPoints()
         if ns.c_nameInHealthbar then
             -- Reparent to hp so it renders above statusbar fill
             myPlate.nameText:SetParent(myPlate.hp)
             myPlate.nameText:SetDrawLayer("OVERLAY", 7)
-            PixelUtil.SetPoint(myPlate.nameText, "LEFT", myPlate.hp, "LEFT", 4, 0, 1, 1)
+            PixelUtil.SetPoint(myPlate.nameText, "LEFT", myPlate.hp, "LEFT", 4, ns.c_nameTextYOffset, 1, 1)
             myPlate.nameText:SetJustifyH("LEFT")
             myPlate.nameText:SetWidth(ns.c_width * 0.6)
             myPlate.nameText:SetWordWrap(false)
@@ -2987,12 +3006,12 @@ function ns:UpdatePlateStyle(myPlate)
             -- Reparent back to myPlate
             myPlate.nameText:SetParent(myPlate)
             myPlate.nameText:SetDrawLayer("OVERLAY")
-            PixelUtil.SetPoint(myPlate.nameText, "BOTTOM", myPlate.hp, "TOP", 0, 3, 1, 1)
+            PixelUtil.SetPoint(myPlate.nameText, "BOTTOM", myPlate.hp, "TOP", 0, 2 + ns.c_nameTextYOffset, 1, 1)
             myPlate.nameText:SetJustifyH("CENTER")
             myPlate.nameText:SetWidth(0)
             myPlate.nameText:SetWordWrap(true)
         end
-        
+
         if myPlate.healthText then
             myPlate.healthText:ClearAllPoints()
             if ns.c_nameInHealthbar then
@@ -3003,19 +3022,20 @@ function ns:UpdatePlateStyle(myPlate)
                 myPlate.healthText:SetJustifyH("CENTER")
             end
         end
-        
+
         -- Reset level text position cache so it repositions
         if myPlate.levelText then
             myPlate.levelText._lastPositionKey = nil
         end
-        
+
         myPlate._lastNameInHealthbar = ns.c_nameInHealthbar
+        myPlate._lastNameTextYOffset = ns.c_nameTextYOffset
     end
-    
+
     -- Update health text font and visibility setting
     if myPlate.healthText then
         if myPlate._lastHealthFont ~= ns.c_font or myPlate._lastHealthFontSize ~= ns.c_healthValueFontSize or myPlate._lastHealthFontOutline ~= ns.c_fontOutline then
-            myPlate.healthText:SetFont(ns.c_font, ns.c_healthValueFontSize, ns.c_fontOutline)
+            ns:SetFontSafe(myPlate.healthText, ns.c_font, ns.c_healthValueFontSize, ns.c_fontOutline)
             myPlate._lastHealthFont = ns.c_font
             myPlate._lastHealthFontSize = ns.c_healthValueFontSize
             myPlate._lastHealthFontOutline = ns.c_fontOutline
@@ -3093,7 +3113,7 @@ function ns:UpdatePlateStyle(myPlate)
             myPlate._lastMaxBuffs = ns.c_maxBuffs
         end
     end
-    
+
     -- Update raid icon size and position (only if settings changed)
     if myPlate.raidIcon and (myPlate._lastRaidSize ~= ns.c_raidMarkerSize or myPlate._lastRaidAnchor ~= ns.c_raidMarkerAnchor or myPlate._lastRaidX ~= ns.c_raidMarkerX or myPlate._lastRaidY ~= ns.c_raidMarkerY) then
         PixelUtil.SetSize(myPlate.raidIcon, ns.c_raidMarkerSize, ns.c_raidMarkerSize, 1, 1)
@@ -3114,10 +3134,10 @@ function ns:UpdatePlateStyle(myPlate)
         myPlate._lastRaidX = ns.c_raidMarkerX
         myPlate._lastRaidY = ns.c_raidMarkerY
     end
-    
+
     -- Update quest icon position and scale (anchor/scale/offsets/nameInHealthbar may have changed)
     if myPlate.questIcon then
-        local needsUpdate = myPlate._lastQuestAnchor ~= ns.c_questIconAnchor 
+        local needsUpdate = myPlate._lastQuestAnchor ~= ns.c_questIconAnchor
             or myPlate._lastQuestScale ~= ns.c_questIconScale
             or myPlate._lastQuestX ~= ns.c_questIconX
             or myPlate._lastQuestY ~= ns.c_questIconY
@@ -3160,13 +3180,20 @@ function ns:UpdatePlateStyle(myPlate)
             myPlate._lastQuestNameInHealthbar = ns.c_nameInHealthbar
         end
     end
-    
+
     -- Reset classification icon anchor cache so it repositions on next update
     if myPlate.classifyIcon then
         myPlate.classifyIcon._anchor = nil
-        if ns.c_classificationAnchor == "disabled" then
+        myPlate.classifyIcon._style = nil
+        myPlate.classifyIcon._classification = nil
+        myPlate.classifyIcon._lastWidth = nil
+        myPlate.classifyIcon._lastHeight = nil
+        if ns.c_classificationStyle == "none" then
             myPlate.classifyIcon:Hide()
         end
+    end
+    if myPlate.unit and ns.UpdateClassificationIndicator then
+        ns.UpdateClassificationIndicator(myPlate.unit)
     end
 
     -- Only style castbar if it exists (deferred creation)
@@ -3174,21 +3201,21 @@ function ns:UpdatePlateStyle(myPlate)
         local iconSize = ns.c_castHeight
         local showIcon = ns.c_showCastIcon
         local castbarWidth = showIcon and (ns.c_width - iconSize - 2) or ns.c_width
-        
+
         -- Cache castbar styling to avoid redundant calls
         local cbNeedsUpdate = myPlate._lastCastWidth ~= castbarWidth or myPlate._lastCastHeight ~= ns.c_castHeight or myPlate._lastCastTexture ~= ns.c_texture or myPlate._lastCastShowIcon ~= showIcon
-        
+
         if cbNeedsUpdate then
             PixelUtil.SetWidth(myPlate.castbar, castbarWidth, 1)
             PixelUtil.SetHeight(myPlate.castbar, ns.c_castHeight, 1)
             myPlate.castbar:SetStatusBarTexture(ns.c_texture)
             myPlate.castbar:ClearAllPoints()
-            
+
             -- Update spark size based on castbar height
             if myPlate.castbar.spark then
                 PixelUtil.SetSize(myPlate.castbar.spark, 16, ns.c_castHeight * 2, 1, 1)
             end
-            
+
             if showIcon then
                 PixelUtil.SetPoint(myPlate.castbar, "TOPLEFT", myPlate.hp, "BOTTOMLEFT", iconSize + 2, -2, 1, 1)
             else
@@ -3201,13 +3228,13 @@ function ns:UpdatePlateStyle(myPlate)
                 myPlate.castbar.icon:ClearAllPoints()
                 PixelUtil.SetPoint(myPlate.castbar.icon, "RIGHT", myPlate.castbar, "LEFT", -2, 0, 1, 1)
                 myPlate.castbar.icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
-                
+
                 -- Position icon border (same size as icon, border textures extend outside)
                 if myPlate.castbar.iconBorder then
                     myPlate.castbar.iconBorder:ClearAllPoints()
                     myPlate.castbar.iconBorder:SetAllPoints(myPlate.castbar.icon)
                 end
-                
+
                 -- Ensure icons stay hidden when disabled (don't show until cast starts)
                 if not showIcon then
                     myPlate.castbar.icon:Hide()
@@ -3216,7 +3243,7 @@ function ns:UpdatePlateStyle(myPlate)
                     end
                 end
             end
-            
+
             -- Update cache
             myPlate._lastCastWidth = castbarWidth
             myPlate._lastCastHeight = ns.c_castHeight
@@ -3233,13 +3260,13 @@ function ns:UpdatePlateStyle(myPlate)
         local isPersonalPlate = myPlate.isPlayer
         local offsetX = isPersonalPlate and ns.c_cpPersonalX or ns.c_cpX
         local offsetY = isPersonalPlate and ns.c_cpPersonalY or ns.c_cpY
-        
+
         -- Check if style changed - need to recreate combo points
         if myPlate.cpStyle ~= currentStyle then
             EnsureComboPoints(myPlate, isPersonalPlate)
             -- Force update after recreation
             myPlate._lastCpSize = nil
-            
+
             -- Re-show combo points after style change
             -- For target plate: show if this is target and combo points enabled (not personal mode)
             -- For personal plate: show if personal mode enabled
@@ -3259,21 +3286,21 @@ function ns:UpdatePlateStyle(myPlate)
                 end
             end
         end
-        
+
         local cpNeedsUpdate = myPlate._lastCpSize ~= cpWidth or myPlate._lastCpOffsetX ~= offsetX or myPlate._lastCpOffsetY ~= offsetY
-        
+
         if cpNeedsUpdate then
             local numCPs = #myPlate.cps
-            
+
             if currentStyle == 2 then
                 -- ROUNDED STYLE - square textures, glow behind
                 local spacing = -1  -- Slight overlap
                 local totalWidth = (cpWidth * numCPs) + (spacing * (numCPs - 1))
-                
+
                 PixelUtil.SetSize(myPlate.cpContainer, totalWidth, cpWidth, 1, 1)
                 myPlate.cpContainer:ClearAllPoints()
                 myPlate.cpContainer:SetPoint("BOTTOM", myPlate.hp, "TOP", offsetX, -1 + offsetY)
-                
+
                 for i = 1, numCPs do
                     PixelUtil.SetSize(myPlate.cps[i], cpWidth, cpWidth, 1, 1)
                     myPlate.cps[i]:ClearAllPoints()
@@ -3288,11 +3315,11 @@ function ns:UpdatePlateStyle(myPlate)
                 local cpHeight = 4
                 local spacing = 1  -- 1px gap between bars
                 local totalWidth = (cpWidth * numCPs) + (spacing * (numCPs - 1))
-                
+
                 PixelUtil.SetSize(myPlate.cpContainer, totalWidth, cpHeight, 1, 1)
                 myPlate.cpContainer:ClearAllPoints()
                 myPlate.cpContainer:SetPoint("BOTTOM", myPlate.hp, "TOP", offsetX, -1 + offsetY)
-                
+
                 for i = 1, numCPs do
                     myPlate.cps[i]:ClearAllPoints()
                     PixelUtil.SetSize(myPlate.cps[i], cpWidth, cpHeight, 1, 1)
@@ -3303,23 +3330,23 @@ function ns:UpdatePlateStyle(myPlate)
                     end
                 end
             end
-            
+
             myPlate._lastCpSize = cpWidth
             myPlate._lastCpOffsetX = offsetX
             myPlate._lastCpOffsetY = offsetY
         end
     end
-    
+
     -- Update target glow style if this plate is the current target
     if myPlate.targetGlow and ns.currentTargetPlate == myPlate then
         UpdateTargetGlow(myPlate, true)
     end
-    
+
     -- Update health bar color (for non-personal plates when color settings change)
     if not myPlate.isPlayer and myPlate.unit then
         UpdateColor(myPlate.unit)
     end
-    
+
     -- Apply scale when settings change (not handled elsewhere during UpdateAllPlates)
     local targetScale = ns.c_scale
     if myPlate.isPlayer then
@@ -3333,7 +3360,7 @@ function ns:UpdatePlateStyle(myPlate)
     elseif myPlate.isFriendly then
         targetScale = ns.c_scale * ns.c_friendlyScale
     end
-    
+
     if myPlate._lastScale ~= targetScale then
         myPlate:SetScale(targetScale)
         myPlate._lastScale = targetScale
@@ -3359,13 +3386,13 @@ local function UpdateHealPrediction(myPlate)
     local barWidth = hp:GetWidth()
     local healthPercent = health / maxHealth
     local healPercent = incomingHeal / maxHealth
-    
+
     -- Get current absorb bar width in pixels (0 if hidden)
     local absorbOffset = 0
     if hp.absorbBar and hp.absorbBar:IsShown() then
         absorbOffset = hp.absorbBar:GetWidth() or 0
     end
-    
+
     -- Calculate max heal width based on displayed absorb (pixels), not total absorb
     -- Heal bar starts at: health edge + absorbOffset
     -- Heal bar can extend up to: 20% past bar right edge
@@ -3418,7 +3445,7 @@ local function UpdateAbsorb(unit, myPlate)
 
     -- Calculate how much space is left in the bar after health
     local missingHealthPercent = 1 - healthPercent
-    
+
     -- Absorb bar fills from health edge towards right
     -- Clamp to remaining bar space (overflow shows glow instead)
     local displayPercent = math.min(absorbPercent, missingHealthPercent)
@@ -3451,10 +3478,10 @@ end
 local function UpdateHealth(unit)
     local myPlate = ns.unitToPlate[unit]
     if not myPlate or myPlate.isNameOnly or not myPlate.hp then return end
-    
+
     -- Skip personal plates - they use ProcessPersonalUpdates with ns.c_personalHealthFormat
     if myPlate.isPlayer then return end
-    
+
     local hp = myPlate.hp
     local current = UnitHealth(unit)
     local max = UnitHealthMax(unit)
@@ -3463,7 +3490,7 @@ local function UpdateHealth(unit)
 
     -- Update absorb bar (health changes affect absorb display position)
     UpdateAbsorb(unit, myPlate)
-    
+
     -- Update health value text (only show/hide when state changes)
     if myPlate.healthText and ns.c_healthValueFormat ~= "none" then
         local text = FormatHealthValue(current, max)
@@ -3480,7 +3507,7 @@ local function UpdateHealth(unit)
     elseif myPlate.healthText and myPlate.healthText:IsShown() then
         myPlate.healthText:Hide()
     end
-    
+
     -- Update execute indicator (only reposition when settings change)
     if myPlate.execIndicator then
         local execRange = ns.c_executeRange or 0
@@ -3512,15 +3539,15 @@ end
 local function UpdateLiteHealth(unit)
     local nameplate = C_NamePlate_GetNamePlateForUnit(unit)
     if not nameplate or not nameplate._isLite then return end
-    
+
     local container = nameplate.liteContainer
     if not container or not container.liteHealthBar then return end
-    
+
     if not ns.c_liteHealthWhenDamaged then
         container.liteHealthBar:Hide()
         return
     end
-    
+
     ns:UpdateLiteHealthBar(container, unit)
 end
 
@@ -3564,18 +3591,18 @@ end
 -- Only called on: GROUP_ROSTER_UPDATE, READY_CHECK+10s, PLAYER_ENTERING_WORLD
 local function FindVigilanceCaster(forceRescan)
     local now = GetTime()
-    
+
     -- Use cached result if still fresh
     if not forceRescan and (now - vigilanceScanTime) < GetVigilanceScanInterval() then
         return cachedVigilanceCaster
     end
-    
+
     vigilanceScanTime = now
     cachedVigilanceCaster = nil
-    
+
     -- Scan using modern API
     local inRaid = IsInRaid()
-    
+
     local function ScanUnit(unit)
         for i = 1, 40 do
             local _, _, _, _, _, _, _, caster, _, _, spellId = UnitBuff(unit, i)
@@ -3586,7 +3613,7 @@ local function FindVigilanceCaster(forceRescan)
         end
         return nil
     end
-    
+
     if inRaid then
         for i = 1, GetNumGroupMembers() do
             local unit = "raid" .. i
@@ -3617,7 +3644,7 @@ local function FindVigilanceCaster(forceRescan)
             end
         end
     end
-    
+
     return nil
 end
 
@@ -3625,11 +3652,11 @@ end
 local function IsProtectionWarrior()
     local numTabs = GetNumTalentTabs()
     if numTabs < 3 then return false end
-    
+
     local _, _, pointsSpent1 = GetTalentTabInfo(1)  -- Arms
     local _, _, pointsSpent2 = GetTalentTabInfo(2)  -- Fury
     local _, _, pointsSpent3 = GetTalentTabInfo(3)  -- Protection
-    
+
     -- Consider Protection spec if it has the most points AND at least some investment
     return pointsSpent3 > 0 and pointsSpent3 >= pointsSpent1 and pointsSpent3 >= pointsSpent2
 end
@@ -3641,19 +3668,19 @@ local function GetUnitRole(unit)
     if GetPartyAssignment("MAINTANK", unit) then
         return "TANK"
     end
-    
+
     -- Method 2: Ascension's UnitGroupRolesAssignedKey returns string directly
     -- (This function wraps UnitGroupRolesAssigned internally)
     local role = UnitGroupRolesAssignedKey(unit)
     if role and role ~= "NONE" then
         return role
     end
-    
+
     -- Method 3: Tank aura detection (fallback for manual groups without LFG roles)
     if HasTankAura(unit) then
         return "TANK"
     end
-    
+
     return "NONE"
 end
 
@@ -3665,33 +3692,33 @@ local function UpdatePlayerTankStatus()
         group.playerIsTank = true
         return
     end
-    
+
     -- Priority 2: Check LFG role (UnitGroupRolesAssignedKey always exists in Ascension)
     local role = UnitGroupRolesAssignedKey("player")
     if role == "TANK" then
         group.playerIsTank = true
         return
     end
-    
+
     -- Priority 3: Check tank auras (Shaman/Druid/Paladin)
     if HasTankAura("player") then
         group.playerIsTank = true
         return
     end
-    
+
     -- Priority 4: Check Protection Warrior (most points in Prot tree)
     if IsProtectionWarrior() then
         group.playerIsTank = true
         return
     end
-    
+
     -- Priority 5: Check if player is the Vigilance caster (Warrior tank)
     local vigilanceCaster = FindVigilanceCaster()
     if vigilanceCaster and vigilanceCaster == UnitName("player") then
         group.playerIsTank = true
         return
     end
-    
+
     group.playerIsTank = false
 end
 
@@ -3703,32 +3730,32 @@ local function GetGroupRoleThrottle() return THROTTLE.groupRole * (ns.c_throttle
 
 local function RefreshGroupRoles(forceUpdate, isRetry)
     local now = GetTime()
-    
+
     -- Throttle full group scans (but allow forced updates)
     if not forceUpdate and (now - lastGroupRoleUpdate) < GetGroupRoleThrottle() then
         return
     end
     lastGroupRoleUpdate = now
-    
+
     local inRaid = IsInRaid()
     group.inGroup = inRaid or IsInGroup()
     wipe(group.roles)
     wipe(group.tanks)  -- Clear tank unit list
-    
+
     -- Update player's tank status
     UpdatePlayerTankStatus()
 
     if group.inGroup then
         -- Get Vigilance caster name once (cached for 5s)
         local vigilanceCaster = FindVigilanceCaster()
-        
+
         if inRaid then
             for i = 1, GetNumGroupMembers() do
                 local unit = "raid" .. i
                 if UnitExists(unit) then
                     local guid = UnitGUID(unit)
                     local name = UnitName(unit)
-                    if guid then 
+                    if guid then
                         local role = GetUnitRole(unit)
                         -- Check Vigilance in same loop (avoid double iteration)
                         if vigilanceCaster and name == vigilanceCaster and role ~= "TANK" then
@@ -3748,7 +3775,7 @@ local function RefreshGroupRoles(forceUpdate, isRetry)
                 if UnitExists(unit) then
                     local guid = UnitGUID(unit)
                     local name = UnitName(unit)
-                    if guid then 
+                    if guid then
                         local role = GetUnitRole(unit)
                         -- Check Vigilance in same loop (avoid double iteration)
                         if vigilanceCaster and name == vigilanceCaster and role ~= "TANK" then
@@ -3763,10 +3790,10 @@ local function RefreshGroupRoles(forceUpdate, isRetry)
                 end
             end
         end
-        
+
         -- Include player in group roles
         local playerGUID = UnitGUID("player")
-        if playerGUID then  
+        if playerGUID then
 			local playerRole = GetUnitRole("player")
 			-- Sync with UpdatePlayerTankStatus logic
 			if group.playerIsTank then
@@ -3791,18 +3818,18 @@ end
 local function CheckOffTank(unit)
     -- Use cached group.inGroup flag (updated by RefreshGroupRoles on roster/zone events)
     if not group.inGroup then return false end
-    
+
     -- Iterate cached group.tanks (populated by RefreshGroupRoles)
     for i = 1, #group.tanks do
         local tankUnit = group.tanks[i]
         if UnitExists(tankUnit) then
             local isTanking = UnitDetailedThreatSituation(tankUnit, unit)
-            if isTanking then 
+            if isTanking then
                 return true
             end
         end
     end
-    
+
     return false
 end
 
@@ -3831,10 +3858,10 @@ end
 -- Returns: lead value, hasCompetition (whether anyone else is on threat table)
 local function GetThreatLead(enemyUnit, myThreatValue)
     if not myThreatValue or myThreatValue <= 0 then return nil, false end
-    
+
     local secondHighest = 0
     local cache = threatLeadCache
-    
+
     if cache.isRaid then
         for i = 1, cache.groupSize do
             local unit = "raid" .. i
@@ -3856,7 +3883,7 @@ local function GetThreatLead(enemyUnit, myThreatValue)
             end
         end
     end
-    
+
     -- Check player's pet (always check directly, cheap call)
     if UnitExists("pet") then
         local _, _, _, _, threatVal = UnitDetailedThreatSituation("pet", enemyUnit)
@@ -3864,7 +3891,7 @@ local function GetThreatLead(enemyUnit, myThreatValue)
             secondHighest = threatVal
         end
     end
-    
+
     -- Return lead and whether there's actual competition
     return myThreatValue - secondHighest, secondHighest > 0
 end
@@ -3875,7 +3902,7 @@ end
 local function FormatThreatLead(value, lastValue, lastText)
     -- Normalize to match other threat addons (API returns 100x actual value)
     value = floor(value / 100)
-    
+
     -- Skip recalculation if change is minimal (within 2%)
     if lastValue and lastText then
         local diff = math.abs(value - lastValue)
@@ -3884,7 +3911,7 @@ local function FormatThreatLead(value, lastValue, lastText)
             return lastText, lastValue
         end
     end
-    
+
     local text
     if value >= 1000000 then
         text = format("+%.1fM", value / 1000000)
@@ -3900,14 +3927,14 @@ end
 local function UpdateThreatTextAnchor(myPlate)
     local threatText = myPlate.threatText
     if not threatText then return end
-    
+
     local anchor = ns.c_threatTextAnchor
     local offsetX = ns.c_threatTextOffsetX or 2
     local offsetY = ns.c_threatTextOffsetY or 0
     local hp = myPlate.hp
-    
+
     threatText:ClearAllPoints()
-    
+
     if anchor == "right_hp" then
         PixelUtil.SetPoint(threatText, "LEFT", hp, "RIGHT", offsetX, offsetY, 1, 1)
         threatText:SetJustifyH("LEFT")
@@ -3927,7 +3954,7 @@ local function UpdateThreatTextAnchor(myPlate)
         -- Dynamic anchor: find rightmost visible element
         local anchorTo = myPlate.nameText
         local anchorPoint = "RIGHT"
-        
+
         -- Check quest icon first (rightmost if visible)
         if myPlate.questIcon and myPlate.questIcon:IsShown() then
             anchorTo = myPlate.questIcon
@@ -3935,7 +3962,7 @@ local function UpdateThreatTextAnchor(myPlate)
         elseif myPlate.levelText and myPlate.levelText:IsShown() then
             anchorTo = myPlate.levelText
         end
-        
+
         PixelUtil.SetPoint(threatText, "LEFT", anchorTo, "RIGHT", offsetX, offsetY, 1, 1)
         threatText:SetJustifyH("LEFT")
     end
@@ -3944,10 +3971,10 @@ end
 -- Update threat text display
 local function UpdateThreatText(unit, myPlate)
     if not myPlate or not myPlate.threatText then return end
-    
+
     local threatText = myPlate.threatText
     local anchor = ns.c_threatTextAnchor
-    
+
     -- Hide if disabled, friendly, or personal bar
     if anchor == "disabled" or myPlate.isPlayer or UnitIsFriend("player", unit) then
         threatText:Hide()
@@ -3956,7 +3983,7 @@ local function UpdateThreatText(unit, myPlate)
         threatText._lastLeadValue = nil
         return
     end
-    
+
     -- Only show for hostile NPCs on threat table
     if UnitIsPlayer(unit) or UnitPlayerControlled(unit) then
         threatText:Hide()
@@ -3965,10 +3992,10 @@ local function UpdateThreatText(unit, myPlate)
         threatText._lastLeadValue = nil
         return
     end
-    
+
     -- Get threat info (5th return is raw threat value)
     local isTanking, status, scaledPct, rawPct, threatValue = UnitDetailedThreatSituation("player", unit)
-    
+
     -- Hide if not on threat table
     if status == nil or not scaledPct or scaledPct <= 0 then
         threatText:Hide()
@@ -3977,21 +4004,21 @@ local function UpdateThreatText(unit, myPlate)
         threatText._lastLeadValue = nil
         return
     end
-    
+
     -- Update font if changed
     if threatText._lastFont ~= ns.c_font or threatText._lastSize ~= ns.c_threatTextFontSize or threatText._lastOutline ~= ns.c_fontOutline then
-        threatText:SetFont(ns.c_font, ns.c_threatTextFontSize, ns.c_fontOutline)
+        ns:SetFontSafe(threatText, ns.c_font, ns.c_threatTextFontSize, ns.c_fontOutline)
         threatText._lastFont = ns.c_font
         threatText._lastSize = ns.c_threatTextFontSize
         threatText._lastOutline = ns.c_fontOutline
     end
-    
+
     -- Update anchor (handles dynamic "right_name" mode)
     if anchor == "right_name" or threatText._lastAnchor ~= anchor then
         UpdateThreatTextAnchor(myPlate)
         threatText._lastAnchor = anchor
     end
-    
+
     -- Determine tank mode
     local tankModeActive = false
     local tankModeValue = ns.c_tankMode
@@ -4000,11 +4027,11 @@ local function UpdateThreatText(unit, myPlate)
     elseif tankModeValue == 1 then
         tankModeActive = group.playerIsTank
     end
-    
+
     -- Only show threat text when there's meaningful competition
     local cache = threatLeadCache
     local inGroup = cache.groupSize > 0 or UnitExists("pet")
-    
+
     -- Solo: hide threat text entirely (no point showing 100%)
     if not inGroup then
         threatText:Hide()
@@ -4013,10 +4040,10 @@ local function UpdateThreatText(unit, myPlate)
         threatText._lastLeadValue = nil
         return
     end
-    
+
     local threatLead = nil
     local hasCompetition = false
-    
+
     if isTanking then
         -- Tanking: show lead if there's competition
         threatLead, hasCompetition = GetThreatLead(unit, threatValue)
@@ -4045,7 +4072,7 @@ local function UpdateThreatText(unit, myPlate)
             threatText._lastLeadValue = nil
         end
     end
-    
+
     -- Color based on threat status
     if tankModeActive then
         -- Tank mode: use threat lead for more granular color when available
@@ -4076,7 +4103,7 @@ local function UpdateThreatText(unit, myPlate)
             threatText:SetTextColor(ns.c_dpsAggroColor_r, ns.c_dpsAggroColor_g, ns.c_dpsAggroColor_b)
         end
     end
-    
+
     threatText:Show()
 end
 
@@ -4088,20 +4115,26 @@ ns.UpdateThreatTextAnchor = UpdateThreatTextAnchor
 UpdateColor = function(unit)
     local myPlate = ns.unitToPlate[unit]
     if not myPlate or myPlate.isNameOnly or not myPlate.hp then return end
-    
+
     -- Skip personal bar - it has its own color logic
     if myPlate.isPlayer then return end
-    
+
     local isPlayer = UnitIsPlayer(unit)
     local isFriendly = UnitIsFriend("player", unit)
-    
+
     -- Update threat text display
     UpdateThreatText(unit, myPlate)
-    
+
+    local auraColor = myPlate._auraColorOverride
+    if auraColor then
+        myPlate.hp:SetStatusBarColor(auraColor.r, auraColor.g, auraColor.b)
+        return
+    end
+
     -- ===========================================
     -- EARLY RETURNS - Units that never get threat coloring
     -- ===========================================
-    
+
     -- 1. Friendly units - use class color if enabled, otherwise green
     if isFriendly then
         if isPlayer and ns.c_classColoredHealth then
@@ -4122,7 +4155,7 @@ UpdateColor = function(unit)
         end
         return
     end
-    
+
     -- 2. Players (hostile) - no threat/aggro concept, use class or reaction colors
     if isPlayer then
         -- Try class color if enabled
@@ -4140,62 +4173,62 @@ UpdateColor = function(unit)
         myPlate.hp:SetStatusBarColor(ns.c_hpColor_r, ns.c_hpColor_g, ns.c_hpColor_b)
         return
     end
-    
+
     -- 3. Tapped NPCs (grey out mobs tagged by other players)
     if UnitIsTapped(unit) and not UnitIsTappedByPlayer(unit) then
         myPlate.hp:SetStatusBarColor(ns.c_tappedColor_r, ns.c_tappedColor_g, ns.c_tappedColor_b)
         return
     end
-    
+
     -- 4. Player-controlled units (hostile pets, totems, mind-controlled, etc.) - flat color, no threat
     if UnitPlayerControlled(unit) then
         myPlate.hp:SetStatusBarColor(ns.c_petColor_r, ns.c_petColor_g, ns.c_petColor_b)
         return
     end
-    
+
     -- ===========================================
     -- THREAT COLORING - Hostile NPCs and neutral mobs in combat
     -- ===========================================
-    
+
     -- Get threat status using UnitDetailedThreatSituation for more reliable results
     -- Returns: isTanking, status, threatPct, rawThreatPct, threatValue
     -- status: nil = not on threat table, 0 = not tanking (lowest threat), 1 = not tanking but higher threat,
     --         2 = insecurely tanking, 3 = securely tanking
     local isTanking, status = UnitDetailedThreatSituation("player", unit)
-    
+
     -- 5. Neutral NPCs (reaction 4) and Critters - yellow if not in combat with us
     local reaction = UnitReaction(unit, "player")
     if status == nil and ((reaction and reaction == 4) or UnitCreatureType(unit) == "Critter") then
         myPlate.hp:SetStatusBarColor(1, 1, 0)
         return
     end
-    
+
     -- If not on threat table at all (nil), use default hostile color - no threat coloring
     -- Note: status 0 means ON threat table but lowest priority - still gets threat colors
     if status == nil then
         myPlate.hp:SetStatusBarColor(ns.c_hpColor_r, ns.c_hpColor_g, ns.c_hpColor_b)
         return
     end
-    
+
     -- From here, status is 0, 1, 2, or 3 - unit is on the threat table
-    
+
     -- Determine if tank mode is active
     local tankModeActive = false
     local tankModeValue = ns.c_tankMode
-    
+
     if tankModeValue == 2 then
         tankModeActive = true
     elseif tankModeValue == 1 then
         tankModeActive = group.playerIsTank
     end
-    
+
     if tankModeActive then
         -- TANK MODE COLORS:
         -- status 3 = Secure aggro -> secureColor (good - you have solid aggro)
         -- status 2 = Insecure tanking -> transColor (warning - you have aggro but losing it)
         -- status 1 = High threat but not tanking -> check off-tank situation
         -- status 0 = Lowest threat -> insecureColor (bad - you need to get aggro)
-        
+
         if status == 3 then
             -- Secure aggro - GOOD for tank
             myPlate.hp:SetStatusBarColor(ns.c_secureColor_r, ns.c_secureColor_g, ns.c_secureColor_b)
@@ -4229,7 +4262,7 @@ UpdateColor = function(unit)
         -- status 2 = You're tanking insecurely -> dpsTransColor (warning - losing aggro)
         -- status 1 = High threat but not tanking -> dpsTransColor (warning - watch your threat)
         -- status 0 = Lowest threat -> dpsSecureColor (safe - you have no threat issues)
-        
+
         if status == 3 then
             -- You have solid aggro - BAD for DPS
             myPlate.hp:SetStatusBarColor(ns.c_dpsAggroColor_r, ns.c_dpsAggroColor_g, ns.c_dpsAggroColor_b)
@@ -4242,6 +4275,7 @@ UpdateColor = function(unit)
         end
     end
 end
+ns.UpdateColor = UpdateColor
 
 -- Register for group updates - ONLY scan on specific events:
 -- 1. GROUP_ROSTER_UPDATE (group composition changes)
@@ -4340,7 +4374,7 @@ local function UpdateTarget()
         local prevUnit = ns.currentTargetPlate.unit
         local plateGUID = prevUnit and UnitGUID(prevUnit)
         local stillValid = plateGUID and plateGUID == ns.currentTargetGUID
-        
+
         -- Hide combo points on previous target
         if ns.currentTargetPlate.cps then
             for i = 1, #ns.currentTargetPlate.cps do
@@ -4348,7 +4382,7 @@ local function UpdateTarget()
             end
         end
         UpdateTargetGlow(ns.currentTargetPlate, false)
-        
+
         -- Only reset scale if plate wasn't recycled (OnNamePlateRemoved handles recycled plates)
         if stillValid then
             if UnitIsPet(prevUnit) then
@@ -4362,22 +4396,22 @@ local function UpdateTarget()
     end
     ns.currentTargetPlate = nil
     ns.currentTargetGUID = nil
-    
+
     -- Find new target's nameplate
     if UnitExists("target") then
         ns.currentTargetGUID = UnitGUID("target")
         local nameplate = C_NamePlate_GetNamePlateForUnit("target")
         if nameplate and nameplate.myPlate and not nameplate.myPlate.isNameOnly then
             ns.currentTargetPlate = nameplate.myPlate
-            
+
             -- Apply target scale (relative to base scale) - but not to personal bar
             if not ns.currentTargetPlate.isPlayer then
                 ns.currentTargetPlate:SetScale(ns.c_scale * ns.c_targetScale)
             end
-            
+
             -- Show target glow on new target
             UpdateTargetGlow(ns.currentTargetPlate, true)
-            
+
             -- Handle combo points: personal bar mode takes priority
             if ns.c_cpOnPersonalBar then
                 -- Personal mode active - hide any combo points on target plate
@@ -4429,7 +4463,7 @@ local function ValidateTargetPlate()
         end
         return
     end
-    
+
     -- Check if cached plate still matches GUID
     if ns.currentTargetPlate then
         local unit = ns.currentTargetPlate.unit
@@ -4447,7 +4481,7 @@ local function ValidateTargetPlate()
         end
         ns.currentTargetPlate = nil
     end
-    
+
     -- Find correct plate by GUID
     ns.currentTargetPlate = GetPlateByGUID(ns.currentTargetGUID)
     if ns.currentTargetPlate then
@@ -4456,7 +4490,7 @@ local function ValidateTargetPlate()
             ns.currentTargetPlate:SetScale(ns.c_scale * ns.c_targetScale)
         end
         UpdateTargetGlow(ns.currentTargetPlate, true)
-        
+
         -- Restore combo points (only in target mode, not personal bar mode)
         if ns.c_showComboPoints and not ns.c_cpOnPersonalBar and not UnitIsFriend("player", "target") then
             EnsureComboPoints(ns.currentTargetPlate)
@@ -4481,7 +4515,7 @@ ns.ValidateTargetPlate = ValidateTargetPlate
 -- Ensure raid icon exists (creates on-demand for any plate type)
 local function EnsureRaidIcon(myPlate)
     if myPlate.raidIcon then return end
-    
+
     local myRaidIcon = myPlate:CreateTexture(nil, "OVERLAY")
     PixelUtil.SetSize(myRaidIcon, ns.c_raidMarkerSize, ns.c_raidMarkerSize, 1, 1)
     myRaidIcon:SetTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcons")
@@ -4493,50 +4527,50 @@ end
 local function UpdateLevelText(unit)
     local myPlate = ns.unitToPlate[unit]
     if not myPlate or not myPlate.levelText then return end
-    
+
     local levelMode = ns.c_levelMode
     if levelMode == "disabled" then
         myPlate.levelText:Hide()
         return
     end
-    
+
     -- Hide level text in arenas when arena numbers are shown
     if inArena and ns.c_arenaNumbers then
         myPlate.levelText:Hide()
         return
     end
-    
+
     -- Check if we should show based on mode and unit type
     local isFriendly = UnitIsFriend("player", unit)
     if levelMode == "enemies" and isFriendly then
         myPlate.levelText:Hide()
         return
     end
-    
+
     -- Don't show level for player's own nameplate
     if UnitIsUnit(unit, "player") then
         myPlate.levelText:Hide()
         return
     end
-    
+
     local level = UnitLevel(unit)
-    
+
     -- Skip if unit is same level as player (level > 0 to still show skull units)
     if level > 0 and level == ns.c_playerLevel then
         myPlate.levelText:Hide()
         return
     end
-    
+
     local levelText = myPlate.levelText
-    
+
     -- Font caching
     if levelText._lastFont ~= ns.c_font or levelText._lastFontSize ~= ns.c_fontSize or levelText._lastOutline ~= ns.c_fontOutline then
-        levelText:SetFont(ns.c_font, ns.c_fontSize, ns.c_fontOutline)
+        ns:SetFontSafe(levelText, ns.c_font, ns.c_fontSize, ns.c_fontOutline)
         levelText._lastFont = ns.c_font
         levelText._lastFontSize = ns.c_fontSize
         levelText._lastOutline = ns.c_fontOutline
     end
-    
+
     -- Position caching (depends on name display format and nameInHealthbar)
     local positionKey = ns.c_nameDisplayFormat .. (ns.c_nameInHealthbar and "_inbar" or "")
     if levelText._lastPositionKey ~= positionKey then
@@ -4551,7 +4585,7 @@ local function UpdateLevelText(unit)
         end
         levelText._lastPositionKey = positionKey
     end
-    
+
     -- Get difficulty color
     local color
     if level <= 0 then
@@ -4562,7 +4596,7 @@ local function UpdateLevelText(unit)
         color = GetQuestDifficultyColor(level)
         levelText:SetText(level)
     end
-    
+
     levelText:SetTextColor(color.r, color.g, color.b)
     levelText:Show()
 end
@@ -4570,8 +4604,8 @@ end
 -- Export for Core.lua (PLAYER_LEVEL_UP handler)
 ns.UpdateLevelText = UpdateLevelText
 
--- Classification icon atlas textures
-local ClassificationAtlas = {
+-- Classification icon atlas/textures
+ns.ClassificationAtlas = {
     rare = "warfront-alliancehero",
     elite = "islands-azeriteboss",
     rareelite = "warfront-hordehero",
@@ -4579,59 +4613,140 @@ local ClassificationAtlas = {
     boss = "dungeonskull",
 }
 
+ns.ClassificationTextureStyles = {
+    colored_skulls = {
+        texture = "Interface\\AddOns\\TurboPlates\\Textures\\EliteIcons\\ElvUI_SkullIcon.tga",
+        ratio = 0.9166666667,
+        coords = { 0.078125, 0.9375, 0.03125, 0.96875 },
+    },
+    elvui_dragons = {
+        texture = "Interface\\AddOns\\TurboPlates\\Textures\\EliteIcons\\ElvUI_Nameplates.blp",
+        ratio = 1.3,
+        coordsByClassification = {
+            rare = { 0, 0.15234375, 0.671875, 0.90625 },
+            elite = { 0, 0.15234375, 0.359375, 0.59375 },
+            rareelite = { 0, 0.15234375, 0.359375, 0.59375 },
+            worldboss = { 0, 0.15234375, 0.359375, 0.59375 },
+            boss = { 0, 0.15234375, 0.359375, 0.59375 },
+        },
+    },
+    sre_classic = {
+        folder = "Interface\\AddOns\\TurboPlates\\Textures\\EliteIcons\\SRE\\classic\\",
+        ratio = 1.9595959596,
+        coords = { 0.00390625, 0.76171875, 0, 0.7734375 },
+    },
+    sre_modern = {
+        folder = "Interface\\AddOns\\TurboPlates\\Textures\\EliteIcons\\SRE\\modern\\",
+        ratio = 1.24,
+        coords = { 0, 0.96875, 0, 0.78125 },
+    },
+    sre_tiny = {
+        folder = "Interface\\AddOns\\TurboPlates\\Textures\\EliteIcons\\SRE\\tiny\\",
+        ratio = 1.4819277108,
+        coords = { 0.0078125, 0.96875, 0, 0.6484375 },
+    },
+}
+
+ns.ClassificationSkullColors = {
+    rare = { 1, 0.82, 0 },
+    elite = { 1, 0.82, 0 },
+    rareelite = { 1, 0.45, 0 },
+    worldboss = { 1, 0.05, 0.05 },
+    boss = { 1, 0.05, 0.05 },
+}
+
+function ns.ApplyClassificationIconTexture(icon, style, classification)
+    if not ns.ClassificationAtlas[classification] then return nil end
+
+    icon:SetVertexColor(1, 1, 1, 1)
+    icon:SetTexCoord(0, 1, 0, 1)
+
+    if style == "default" then
+        local atlasName = classification and ns.ClassificationAtlas[classification]
+        if not atlasName then return nil end
+        icon:SetAtlas(atlasName)
+        return 1
+    end
+
+    local styleInfo = ns.ClassificationTextureStyles[style]
+    if not styleInfo then return nil end
+
+    if styleInfo.texture then
+        icon:SetTexture(styleInfo.texture)
+    elseif styleInfo.folder then
+        local fileKey = classification == "boss" and "worldboss" or classification
+        icon:SetTexture(styleInfo.folder .. fileKey .. ".tga")
+    end
+
+    local coords = styleInfo.coords
+    if styleInfo.coordsByClassification then
+        coords = styleInfo.coordsByClassification[classification]
+    end
+    if coords then
+        icon:SetTexCoord(coords[1], coords[2], coords[3], coords[4])
+    end
+
+    if style == "colored_skulls" then
+        local color = ns.ClassificationSkullColors[classification]
+        if color then icon:SetVertexColor(color[1], color[2], color[3], 1) end
+    end
+
+    return styleInfo.ratio or 1
+end
+
 -- Update classification indicator (elite/rare/boss star icon)
-local function UpdateClassificationIndicator(unit)
+function ns.UpdateClassificationIndicator(unit)
     local myPlate = ns.unitToPlate[unit]
     if not myPlate then return end
-    
+
     local classifyIcon = myPlate.classifyIcon
     if not classifyIcon then return end
-    
+
     local anchor = ns.c_classificationAnchor
-    
+    local style = ns.c_classificationStyle or "default"
+
     -- Early exit for disabled or name-only plates
-    if anchor == "disabled" or myPlate.isNameOnly then
+    if style == "none" or myPlate.isNameOnly then
         classifyIcon:Hide()
         return
     end
-    
+
     local classification = UnitClassification(unit)
-    
+
     -- Check for skull level (boss) - elite/rareelite mobs with level <= 0 are dungeon/raid bosses
     if (classification == "elite" or classification == "rareelite") and UnitLevel(unit) <= 0 then
         classification = "boss"
     end
-    
-    local atlasName = classification and ClassificationAtlas[classification]
-    
-    if atlasName then
-        classifyIcon:SetAtlas(atlasName)
-        
-        -- Size: boss/worldboss use 12x12, others use 18x18 (cached)
-        local iconSize = (classification == "boss" or classification == "worldboss") and 12 or 18
-        if classifyIcon._lastSize ~= iconSize then
-            PixelUtil.SetSize(classifyIcon, iconSize, iconSize, 1, 1)
-            classifyIcon._lastSize = iconSize
+
+    local ratio = classification and ns.ApplyClassificationIconTexture(classifyIcon, style, classification)
+
+    if ratio then
+        local iconHeight = ns.c_classificationSize or 18
+        local iconWidth = iconHeight * ratio
+
+        if classifyIcon._lastWidth ~= iconWidth or classifyIcon._lastHeight ~= iconHeight then
+            PixelUtil.SetSize(classifyIcon, iconWidth, iconHeight, 1, 1)
+            classifyIcon._lastWidth = iconWidth
+            classifyIcon._lastHeight = iconHeight
         end
-        
-        -- Only reposition if anchor changed (CENTER of icon at corner position)
-        if classifyIcon._anchor ~= anchor then
+
+        local xOffset, yOffset = ns.c_classificationX or 0, ns.c_classificationY or 0
+        local positionKey = anchor .. ":" .. xOffset .. ":" .. yOffset .. ":" .. style .. ":" .. classification
+        if classifyIcon._anchor ~= positionKey then
             classifyIcon:ClearAllPoints()
-            
-            -- Calculate offsets for top anchors (2px down, 2px inward)
-            local xOffset, yOffset = 0, 0
-            if anchor == "TOPLEFT" then
-                xOffset, yOffset = 0, -2  -- Move right and down
-            elseif anchor == "TOP" then
-                xOffset, yOffset = 0, 0  -- Move down only
-            elseif anchor == "TOPRIGHT" then
-                xOffset, yOffset = 0, -2  -- Move left and down
+            if anchor == "RIGHT" then
+                classifyIcon:SetPoint("LEFT", myPlate.hp, "RIGHT", 2 + xOffset, yOffset)
+            elseif anchor == "LEFT" then
+                classifyIcon:SetPoint("RIGHT", myPlate.hp, "LEFT", -2 + xOffset, yOffset)
+            else
+                if anchor == "TOPLEFT" or anchor == "TOPRIGHT" then
+                    yOffset = yOffset - 2
+                end
+                classifyIcon:SetPoint("CENTER", myPlate.hp, anchor or "TOPLEFT", xOffset, yOffset)
             end
-            
-            classifyIcon:SetPoint("CENTER", myPlate.hp, anchor, xOffset, yOffset)
-            classifyIcon._anchor = anchor
+            classifyIcon._anchor = positionKey
         end
-        
+
         classifyIcon:Show()
     else
         classifyIcon:Hide()
@@ -4642,24 +4757,24 @@ end
 local function UpdateRaidIcon(unit)
     local myPlate = ns.unitToPlate[unit]
     if not myPlate then return end
-    
+
     local raidIndex = GetRaidTargetIndex(unit)
     if raidIndex then
         -- Create raid icon on-demand if it doesn't exist
         EnsureRaidIcon(myPlate)
-        
+
         -- Update size (cached)
         if myPlate.raidIcon._lastSize ~= ns.c_raidMarkerSize then
             PixelUtil.SetSize(myPlate.raidIcon, ns.c_raidMarkerSize, ns.c_raidMarkerSize, 1, 1)
             myPlate.raidIcon._lastSize = ns.c_raidMarkerSize
         end
-        
+
         -- Position caching (tracks mode + anchor + offsets)
         local isNameOnly = myPlate.isNameOnly
         local anchor = isNameOnly and "NAME_ONLY" or ns.c_raidMarkerAnchor
         local xOff = isNameOnly and 0 or ns.c_raidMarkerX
         local yOff = isNameOnly and 0 or ns.c_raidMarkerY
-        
+
         if myPlate.raidIcon._lastAnchor ~= anchor or myPlate.raidIcon._lastX ~= xOff or myPlate.raidIcon._lastY ~= yOff then
             myPlate.raidIcon:ClearAllPoints()
             if isNameOnly then
@@ -4679,7 +4794,7 @@ local function UpdateRaidIcon(unit)
             myPlate.raidIcon._lastX = xOff
             myPlate.raidIcon._lastY = yOff
         end
-        
+
         SetRaidTargetIconTexture(myPlate.raidIcon, raidIndex)
         myPlate.raidIcon:Show()
     elseif myPlate.raidIcon then
@@ -4690,7 +4805,7 @@ end
 -- Ensure quest icon exists (creates on-demand for any plate type)
 local function EnsureQuestIcon(myPlate)
     if myPlate.questIcon then return end
-    
+
     local questIcon = myPlate:CreateTexture(nil, "OVERLAY")
     PixelUtil.SetSize(questIcon, 16, 16, 1, 1)
     PixelUtil.SetPoint(questIcon, "LEFT", myPlate.hp, "RIGHT", 2, 0, 1, 1)
@@ -4706,6 +4821,9 @@ local Quest = {
     retryState = {},  -- Key = unit string, Value = { token, attempt }
     MAX_RETRIES = 4,
     RETRY_DELAYS = { 0.15, 0.3, 0.6, 1.2 },  -- Exponential backoff
+    IsObjectiveStatus = function(status)
+        return status == "collect" or status == "objective"
+    end,
 }
 
 -- Update quest objective icon for a unit (full plates)
@@ -4714,41 +4832,41 @@ local Quest = {
 local function UpdateQuestIcon(unit)
     local myPlate = ns.unitToPlate[unit]
     if not myPlate then return end
-    
+
     -- Fast path: quest icons completely disabled
     if not ns.c_questIconsEnabled then
         if myPlate.questIcon then myPlate.questIcon:Hide() end
         return
     end
-    
+
     -- Skip for name-only plates (handled separately by UpdateLiteQuestIcon)
     if myPlate.isNameOnly then
         if myPlate.questIcon then myPlate.questIcon:Hide() end
         return
     end
-    
+
     -- Check if API exists (recheck each call in case C_QuestLog loads late)
     if not (C_QuestLog and C_QuestLog.GetUnitQuestInfo) then
         if myPlate.questIcon then myPlate.questIcon:Hide() end
         return
     end
-    
+
     -- Get quest info for this unit
     -- C_QuestLog.GetUnitQuestInfo returns: questStatus, questID, talkToMe
     local questStatus, questID, talkToMe = C_QuestLog.GetUnitQuestInfo(unit)
-    
+
     -- No quest data for this unit
     if Quest.isNilOrEmpty(talkToMe) and not questStatus then
         -- Retry mechanism with exponential backoff
         if UnitExists(unit) then
             local state = Quest.retryState[unit]
             local attempt = state and state.attempt or 0
-            
+
             if attempt < Quest.MAX_RETRIES then
                 local token = {}
                 local delay = Quest.RETRY_DELAYS[attempt + 1] or 1.2
                 Quest.retryState[unit] = { token = token, attempt = attempt + 1 }
-                
+
                 C_Timer_After(delay, function()
                     local current = Quest.retryState[unit]
                     if not current or current.token ~= token then return end
@@ -4763,10 +4881,10 @@ local function UpdateQuestIcon(unit)
         if myPlate.questIcon then myPlate.questIcon:Hide() end
         return
     end
-    
+
     -- Success - clear retry state for this unit
     Quest.retryState[unit] = nil
-    
+
     -- Validate quest is in log and not complete (mirror lite plate validation)
     if questID and questID > 0 then
         local questLogIndex = Quest.GetLogIndexByID(questID)
@@ -4781,9 +4899,9 @@ local function UpdateQuestIcon(unit)
             end
         end
     end
-    
+
     local atlas, desaturate
-    
+
     -- Check for quest NPC (pickup/turnin) first
     if not Quest.isNilOrEmpty(talkToMe) then
         if not ns.c_showQuestNPCs then
@@ -4798,9 +4916,14 @@ local function UpdateQuestIcon(unit)
         if not atlas and QuestUtil and QuestUtil.GetQuestStatusIcon then
             atlas, desaturate = QuestUtil.GetQuestStatusIcon(questStatus)
         end
-    -- Check for quest objective (kill/collect)
+    -- Quest status can also represent pickup/turnin/trivial NPC icons when talkToMe is empty.
     elseif questStatus then
-        if not ns.c_showQuestObjectives then
+        if Quest.IsObjectiveStatus(questStatus) then
+            if not ns.c_showQuestObjectives then
+                if myPlate.questIcon then myPlate.questIcon:Hide() end
+                return
+            end
+        elseif not ns.c_showQuestNPCs then
             if myPlate.questIcon then myPlate.questIcon:Hide() end
             return
         end
@@ -4812,13 +4935,13 @@ local function UpdateQuestIcon(unit)
         if myPlate.questIcon then myPlate.questIcon:Hide() end
         return
     end
-    
+
     -- Create quest icon on-demand (only when actually showing something)
     EnsureQuestIcon(myPlate)
-    
+
     -- Override kill objective icon
     if atlas == "questkill" then atlas = "tormentors-boss" end
-    
+
     -- Apply atlas texture (UseAtlasSize = true to get base size)
     myPlate.questIcon:SetAtlas(atlas or "questnormal", true)
     local w, h = myPlate.questIcon:GetSize()
@@ -4826,12 +4949,12 @@ local function UpdateQuestIcon(unit)
     if atlas == "tormentors-boss" then w, h = 32, 32 end
     local scale = ns.c_questIconScale * 0.5  -- Match Ascension's internal scaling (* 0.5)
     myPlate.questIcon:SetSize(w * scale, h * scale)
-    
+
     -- Apply desaturation if needed
     if myPlate.questIcon.SetDesaturated then
         myPlate.questIcon:SetDesaturated(desaturate or false)
     end
-    
+
     -- Position based on anchor setting (relative to name text or level text)
     myPlate.questIcon:ClearAllPoints()
     local anchor = ns.c_questIconAnchor
@@ -4849,7 +4972,7 @@ local function UpdateQuestIcon(unit)
     else  -- TOP
         myPlate.questIcon:SetPoint("BOTTOM", myPlate.nameText, "TOP", xOff, 2 + yOff)
     end
-    
+
     myPlate.questIcon:Show()
 end
 
@@ -4857,28 +4980,28 @@ end
 -- Called from Core.lua when updating lite plates
 local function UpdateLiteQuestIcon(nameplate, unit)
     if not nameplate then return end
-    
+
     -- Fast path: quest icons completely disabled
     if not ns.c_questIconsEnabled then
         if nameplate.liteQuestIcon then nameplate.liteQuestIcon:Hide() end
         return
     end
-    
+
     -- Check if API exists (recheck each call in case C_QuestLog loads late)
     if not (C_QuestLog and C_QuestLog.GetUnitQuestInfo) then
         if nameplate.liteQuestIcon then nameplate.liteQuestIcon:Hide() end
         return
     end
-    
+
     -- Get quest info for this unit
     local questStatus, questID, talkToMe = C_QuestLog.GetUnitQuestInfo(unit)
-    
+
     -- No quest data for this unit
     if Quest.isNilOrEmpty(talkToMe) and not questStatus then
         if nameplate.liteQuestIcon then nameplate.liteQuestIcon:Hide() end
         return
     end
-    
+
     -- Validate quest is in log and not complete
     if questID and questID > 0 then
         local questLogIndex = Quest.GetLogIndexByID(questID)
@@ -4893,9 +5016,9 @@ local function UpdateLiteQuestIcon(nameplate, unit)
             end
         end
     end
-    
+
     local atlas, desaturate
-    
+
     -- Check for quest NPC (pickup/turnin) first
     if not Quest.isNilOrEmpty(talkToMe) then
         if not ns.c_showQuestNPCs then
@@ -4909,7 +5032,12 @@ local function UpdateLiteQuestIcon(nameplate, unit)
             atlas, desaturate = QuestUtil.GetQuestStatusIcon(questStatus)
         end
     elseif questStatus then
-        if not ns.c_showQuestObjectives then
+        if Quest.IsObjectiveStatus(questStatus) then
+            if not ns.c_showQuestObjectives then
+                if nameplate.liteQuestIcon then nameplate.liteQuestIcon:Hide() end
+                return
+            end
+        elseif not ns.c_showQuestNPCs then
             if nameplate.liteQuestIcon then nameplate.liteQuestIcon:Hide() end
             return
         end
@@ -4920,7 +5048,7 @@ local function UpdateLiteQuestIcon(nameplate, unit)
         if nameplate.liteQuestIcon then nameplate.liteQuestIcon:Hide() end
         return
     end
-    
+
     -- Create lite quest icon on demand
     if not nameplate.liteQuestIcon then
         local icon = nameplate:CreateTexture(nil, "OVERLAY")
@@ -4929,23 +5057,23 @@ local function UpdateLiteQuestIcon(nameplate, unit)
         icon:Hide()
         nameplate.liteQuestIcon = icon
     end
-    
+
     local icon = nameplate.liteQuestIcon
     local txt = nameplate.liteNameText
-    
+
     -- Override kill objective icon
     if atlas == "questkill" then atlas = "tormentors-boss" end
-    
+
     -- Apply atlas texture
     icon:SetAtlas(atlas or "questnormal", true)
     local w, h = icon:GetSize()
     local scale = ns.c_questIconScale * 0.5
     icon:SetSize(w * scale, h * scale)
-    
+
     if icon.SetDesaturated then
         icon:SetDesaturated(desaturate or false)
     end
-    
+
     -- Position based on anchor (lite plates anchor to liteNameText or liteLevelText)
     icon:ClearAllPoints()
     local anchor = ns.c_questIconAnchor
@@ -4962,7 +5090,7 @@ local function UpdateLiteQuestIcon(nameplate, unit)
     else  -- TOP
         icon:SetPoint("BOTTOM", txt, "TOP", 0, 2)
     end
-    
+
     icon:Show()
 end
 
@@ -4974,7 +5102,7 @@ local function UpdateAllQuestIcons()
             UpdateQuestIcon(unit)
         end
     end
-    
+
     -- Update lite plates
     if C_NamePlateManager_EnumerateActiveNamePlates then
         for nameplate in C_NamePlateManager_EnumerateActiveNamePlates() do
@@ -4997,18 +5125,19 @@ end
 -- Full update for a plate (non-lite plates only)
 function ns:FullPlateUpdate(myPlate, unit)
     if not myPlate or not unit or not UnitExists(unit) then return end
-    
+
     -- Clear stale quest retry state for this unit (fresh start)
     Quest.retryState[unit] = nil
-    
+
     -- Clear stale state from previous unit (plate recycling)
     if myPlate.questIcon then myPlate.questIcon:Hide() end
     myPlate._lastAbsorb = nil  -- Force absorb bar refresh for new unit
     myPlate._lastAbsorbHealth = nil
-    
+    myPlate._auraColorOverride = nil
+
     -- Cache GetTime() at start (used for class cache LRU tracking)
     local now = GetTime()
-    
+
     -- Reset targeting me state for this plate (unit may have changed)
     if myPlate.isTargetingMe then
         myPlate.isTargetingMe = nil
@@ -5018,13 +5147,13 @@ function ns:FullPlateUpdate(myPlate, unit)
             originalColors[myPlate] = nil
         end
     end
-    
+
     local name = UnitName(unit) or ""
     local isPlayer = UnitIsPlayer(unit)
-    
+
     -- Early totem check
     local isTotem = not isPlayer and UnitCreatureType(unit) == "Totem"
-    
+
     -- Check if Gladdy is handling this totem
     if isTotem then
         local basePlate = C_NamePlate.GetNamePlateForUnit(unit)
@@ -5033,20 +5162,20 @@ function ns:FullPlateUpdate(myPlate, unit)
             return
         end
     end
-    
+
     if isTotem and ns.c_totemEnabled then
         -- Minimal setup for compact totems
         myPlate.isNameOnly = false
         EnsureFullPlate(myPlate)
-        
+
         -- Use pre-computed boolean flags (avoid string comparisons)
         local showIcon = ns.c_totemShowIcon
         local showName = ns.c_totemShowName
         local showHP = ns.c_totemShowHP
-        
+
         -- Get friendly status for coloring
         local isFriendly = UnitIsFriend("player", unit)
-        
+
         -- Handle healthbar
         if showHP then
             -- Show compact healthbar (25% normal width)
@@ -5066,7 +5195,7 @@ function ns:FullPlateUpdate(myPlate, unit)
         else
             myPlate.hp:Hide()
         end
-        
+
         -- Handle name text
         if showName then
             myPlate.nameText:SetText(ns:FormatName(name))
@@ -5079,7 +5208,7 @@ function ns:FullPlateUpdate(myPlate, unit)
         else
             myPlate.nameText:Hide()
         end
-        
+
         -- Handle totem icon
         if showIcon and myPlate.totemIconFrame then
             local icon = GetTotemIcon(unit) or TOTEM_FALLBACK_ICON
@@ -5088,20 +5217,20 @@ function ns:FullPlateUpdate(myPlate, unit)
         elseif myPlate.totemIconFrame then
             myPlate.totemIconFrame:Hide()
         end
-        
+
         -- Reparent nameText to myPlate for totem layout (may have been inside hp)
         myPlate.nameText:SetParent(myPlate)
         myPlate.nameText:SetDrawLayer("OVERLAY")
         myPlate.nameText:SetJustifyH("CENTER")
         myPlate.nameText:SetWidth(0)
         myPlate.nameText:SetWordWrap(true)
-        
+
         -- Position elements based on what's visible
         myPlate.nameText:ClearAllPoints()
         if myPlate.totemIconFrame then
             myPlate.totemIconFrame:ClearAllPoints()
         end
-        
+
         if showIcon and showName and showHP then
             -- Icon + Name + HP: name on top, icon middle, hp bottom
             myPlate.nameText:SetPoint("BOTTOM", myPlate, "BOTTOM", 0, 22)
@@ -5126,7 +5255,7 @@ function ns:FullPlateUpdate(myPlate, unit)
             myPlate.hp:ClearAllPoints()
             myPlate.hp:SetPoint("TOP", myPlate.nameText, "BOTTOM", 0, -2)
         end
-        
+
         -- Hide absorb textures (totems don't have shields)
         if myPlate.hp.absorbBar then myPlate.hp.absorbBar:Hide() end
         if myPlate.hp.absorbOverlay then myPlate.hp.absorbOverlay:Hide() end
@@ -5148,10 +5277,10 @@ function ns:FullPlateUpdate(myPlate, unit)
         -- Hide aura containers (totems don't show auras)
         if myPlate.debuffContainer and myPlate.debuffContainer:IsShown() then myPlate.debuffContainer:Hide() end
         if myPlate.buffContainer and myPlate.buffContainer:IsShown() then myPlate.buffContainer:Hide() end
-        
+
         -- Create castbar for totems (some totems like Capacitor Totem cast)
         EnsureCastbar(myPlate)
-        
+
         -- Reposition castbar for totem layout (anchor to bottom-most visible element)
         if myPlate.castbar then
             myPlate.castbar:ClearAllPoints()
@@ -5169,19 +5298,19 @@ function ns:FullPlateUpdate(myPlate, unit)
                 PixelUtil.SetPoint(myPlate.castbar, "TOP", myPlate, "BOTTOM", 0, 10, 1, 1)
             end
         end
-        
+
         -- Mark plate as totem so it gets restored to normal on next non-totem use
         myPlate._wasTotem = true
         myPlate:SetScale(ns.c_scale)
         return
     end
-    
+
     -- ==========================================================================
     -- PERSONAL RESOURCE BAR (Player's own nameplate)
     -- ==========================================================================
     local isPersonal = UnitIsUnit(unit, "player")
     myPlate.isPlayer = isPersonal
-    
+
     if isPersonal then
         -- Early exit if personal bar is disabled (shouldn't happen with CVar sync,
         -- but handles edge cases where nameplate appears before settings loaded)
@@ -5190,15 +5319,15 @@ function ns:FullPlateUpdate(myPlate, unit)
             personalPlateRef = nil  -- Clear cache
             return
         end
-        
+
         -- Cache reference to personal plate for efficient event handling
         personalPlateRef = myPlate
-        
+
         -- Personal bar styling
         myPlate.isNameOnly = false
         EnsureFullPlate(myPlate)
         EnsurePowerBar(myPlate)
-        
+
         -- Apply personal bar dimensions (cached)
         local personalWidth = ns.c_personalWidth
         local personalHeight = ns.c_personalHeight
@@ -5214,14 +5343,14 @@ function ns:FullPlateUpdate(myPlate, unit)
             myPlate.hp:SetStatusBarTexture(ns.c_texture)
             myPlate._lastPersonalTexture = ns.c_texture
         end
-        
+
         -- Position health bar with yOffset (cached)
         if myPlate._lastPersonalY ~= ns.c_personalYOffset then
             myPlate.hp:ClearAllPoints()
             myPlate.hp:SetPoint("CENTER", myPlate, "CENTER", 0, ns.c_personalYOffset)
             myPlate._lastPersonalY = ns.c_personalYOffset
         end
-        
+
         -- Personal health color - use class color if enabled, otherwise user-defined
         if ns.c_personalUseClassColor then
             local _, class = UnitClass("player")
@@ -5238,18 +5367,18 @@ function ns:FullPlateUpdate(myPlate, unit)
             local b = ns.c_personalHealthColor_b or 0
             myPlate.hp:SetStatusBarColor(r, g, b)
         end
-        
+
         -- Update health bar
         local health = UnitHealth(unit)
         local maxHealth = UnitHealthMax(unit)
         myPlate.hp:SetMinMaxValues(0, maxHealth)
         myPlate.hp:SetValue(health)
         myPlate.hp:Show()
-        
+
         -- Update absorb and heal prediction (initial state after reload)
         UpdateAbsorb(unit, myPlate)
         UpdateHealPrediction(myPlate)
-        
+
         -- Health text (uses personal health format)
         if myPlate.healthText then
             local healthFmt = ns.c_personalHealthFormat
@@ -5261,7 +5390,7 @@ function ns:FullPlateUpdate(myPlate, unit)
                 myPlate.healthText:Hide()
             end
         end
-        
+
         -- Update power bar
         if ns.c_personalShowPower then
             -- Cache power bar dimensions
@@ -5282,25 +5411,25 @@ function ns:FullPlateUpdate(myPlate, unit)
             myPlate.powerBar:Hide()
             if myPlate.additionalPowerBar then myPlate.additionalPowerBar:Hide() end
         end
-        
+
         -- Hide name for personal bar (player already knows who they are)
         myPlate.nameText:Hide()
         if myPlate.guildText then myPlate.guildText:Hide() end
         if myPlate.levelText then myPlate.levelText:Hide() end
-        
+
         -- No castbar on personal (player has their own)
         if myPlate.castbar then myPlate.castbar:Hide() end
-        
+
         -- Position aura containers based on personal settings
         if ns.UpdateAuraPositions then
             ns:UpdateAuraPositions(myPlate)
         end
-        
+
         -- Update auras (player auras use different filter)
         if ns.UpdateAuras then
             ns:UpdateAuras(myPlate, unit)
         end
-        
+
         -- Hide elements not needed for personal bar
         if myPlate.raidIcon and myPlate.raidIcon:IsShown() then myPlate.raidIcon:Hide() end
         if myPlate.questIcon and myPlate.questIcon:IsShown() then myPlate.questIcon:Hide() end
@@ -5314,31 +5443,31 @@ function ns:FullPlateUpdate(myPlate, unit)
         if myPlate.highlight and myPlate.highlight:IsShown() then myPlate.highlight:Hide() end
         if myPlate.targetGlow and myPlate.targetGlow:IsShown() then myPlate.targetGlow:Hide() end
         if myPlate.targetingMeGlow and myPlate.targetingMeGlow:IsShown() then myPlate.targetingMeGlow:Hide() end
-        
+
         -- Update personal bar health border (uses its own borderStyle setting, not global healthBarBorder)
         ns:UpdatePersonalBorder()
-        
+
         myPlate:SetScale(ns.c_scale)
         return
     end
-    
+
     -- Cache class if player (on the nameplate frame for local access)
     local class
     if isPlayer then
         _, class = UnitClass(unit)
     end
-    
+
     -- Check friendly status
     local isFriendly = UnitIsFriend("player", unit)
     myPlate.isFriendly = isFriendly
-    
+
     -- Note: Friendly name-only plates are handled by Core.lua's lite system
     -- They never reach this function. This is only for full plates.
-    
+
     -- FULL PLATE MODE: Ensure all components exist
     myPlate.isNameOnly = false
     EnsureFullPlate(myPlate)  -- Creates hp, highlight, totemIcon, raidIcon if missing
-    
+
     -- Hide power bars if this frame was previously used for personal plate (recycling)
     if myPlate.powerBar then
         myPlate.powerBar:Hide()
@@ -5346,12 +5475,12 @@ function ns:FullPlateUpdate(myPlate, unit)
     if myPlate.additionalPowerBar then
         myPlate.additionalPowerBar:Hide()
     end
-    
+
     -- Re-anchor aura containers now that hp exists (for ABOVE_HEALTH/BELOW_HEALTH positions)
     if ns.UpdateAuraPositions then
         ns:UpdateAuraPositions(myPlate)
     end
-    
+
     -- Set name color based on friendly/hostile status
     if isFriendly then
         -- Friendly units: Use class color if player, otherwise green
@@ -5369,7 +5498,7 @@ function ns:FullPlateUpdate(myPlate, unit)
         -- Hostile/Neutral units: Use class color if enabled, otherwise custom hostile color
         local arenaNum = isPlayer and GetArenaNumber(unit)
         local useClassColor = ns.c_classColoredName and isPlayer and class
-        
+
         if useClassColor then
             local classColor = RAID_CLASS_COLORS[class]
             if classColor then
@@ -5380,7 +5509,7 @@ function ns:FullPlateUpdate(myPlate, unit)
         else
             myPlate.nameText:SetTextColor(ns.c_hostileNameColor_r, ns.c_hostileNameColor_g, ns.c_hostileNameColor_b)
         end
-        
+
         -- Set name text (arena number if in arena and enabled, otherwise normal name)
         -- Arena numbers always show regardless of name display format
         if arenaNum then
@@ -5396,7 +5525,7 @@ function ns:FullPlateUpdate(myPlate, unit)
             end
         end
     end
-    
+
     -- Set name text for friendly (no arena number handling needed)
     if isFriendly then
         myPlate.nameText:SetText(ns:FormatName(name))
@@ -5407,16 +5536,16 @@ function ns:FullPlateUpdate(myPlate, unit)
             myPlate.nameText:Show()
         end
     end
-    
+
     -- Hide guild text for normal plates
     if myPlate.guildText then
         myPlate.guildText:Hide()
     end
-    
+
     -- Check if unit is a pet or guardian (totems handled earlier via early return)
     -- UnitIsPet covers hunter/warlock pets, UnitPlayerControlled catches guardians (spirit wolves, treants, etc.)
     local isPet = not isPlayer and (UnitIsPet(unit) or (UnitPlayerControlled(unit) and UnitCreatureType(unit) ~= "Totem"))
-    
+
     -- Restore healthbar and nameText to normal positions only if previously used for totem display
     -- (totem mode repositions both hp and nameText, so we need to reset both)
     if myPlate._wasTotem then
@@ -5428,7 +5557,7 @@ function ns:FullPlateUpdate(myPlate, unit)
         if ns.c_nameInHealthbar then
             myPlate.nameText:SetParent(myPlate.hp)
             myPlate.nameText:SetDrawLayer("OVERLAY", 7)
-            PixelUtil.SetPoint(myPlate.nameText, "LEFT", myPlate.hp, "LEFT", 4, 0, 1, 1)
+            PixelUtil.SetPoint(myPlate.nameText, "LEFT", myPlate.hp, "LEFT", 4, ns.c_nameTextYOffset, 1, 1)
             myPlate.nameText:SetJustifyH("LEFT")
             myPlate.nameText:SetWidth(ns.c_width * 0.6)
             myPlate.nameText:SetWordWrap(false)
@@ -5436,12 +5565,13 @@ function ns:FullPlateUpdate(myPlate, unit)
         else
             myPlate.nameText:SetParent(myPlate)
             myPlate.nameText:SetDrawLayer("OVERLAY")
-            PixelUtil.SetPoint(myPlate.nameText, "BOTTOM", myPlate.hp, "TOP", 0, 3, 1, 1)
+            PixelUtil.SetPoint(myPlate.nameText, "BOTTOM", myPlate.hp, "TOP", 0, 2 + ns.c_nameTextYOffset, 1, 1)
             myPlate.nameText:SetJustifyH("CENTER")
             myPlate.nameText:SetWidth(0)
             myPlate.nameText:SetWordWrap(true)
         end
         myPlate._lastNameInHealthbar = ns.c_nameInHealthbar
+        myPlate._lastNameTextYOffset = ns.c_nameTextYOffset
         -- Re-anchor castbar to hp (totem fallback may have anchored to myPlate:BOTTOM)
         if myPlate.castbar then
             myPlate.castbar:ClearAllPoints()
@@ -5458,15 +5588,15 @@ function ns:FullPlateUpdate(myPlate, unit)
         myPlate._lastHpHeight = nil
         myPlate._lastCastWidth = nil
     end
-    
+
     -- Enforce nameText parent/anchor every FullPlateUpdate (plate may have been recycled
     -- from personal bar, totem, or another state that moved nameText)
-    if myPlate._lastNameInHealthbar ~= ns.c_nameInHealthbar then
+    if myPlate._lastNameInHealthbar ~= ns.c_nameInHealthbar or myPlate._lastNameTextYOffset ~= ns.c_nameTextYOffset then
         myPlate.nameText:ClearAllPoints()
         if ns.c_nameInHealthbar then
             myPlate.nameText:SetParent(myPlate.hp)
             myPlate.nameText:SetDrawLayer("OVERLAY", 7)
-            PixelUtil.SetPoint(myPlate.nameText, "LEFT", myPlate.hp, "LEFT", 4, 0, 1, 1)
+            PixelUtil.SetPoint(myPlate.nameText, "LEFT", myPlate.hp, "LEFT", 4, ns.c_nameTextYOffset, 1, 1)
             myPlate.nameText:SetJustifyH("LEFT")
             myPlate.nameText:SetWidth(ns.c_width * 0.6)
             myPlate.nameText:SetWordWrap(false)
@@ -5474,12 +5604,13 @@ function ns:FullPlateUpdate(myPlate, unit)
         else
             myPlate.nameText:SetParent(myPlate)
             myPlate.nameText:SetDrawLayer("OVERLAY")
-            PixelUtil.SetPoint(myPlate.nameText, "BOTTOM", myPlate.hp, "TOP", 0, 3, 1, 1)
+            PixelUtil.SetPoint(myPlate.nameText, "BOTTOM", myPlate.hp, "TOP", 0, 2 + ns.c_nameTextYOffset, 1, 1)
             myPlate.nameText:SetJustifyH("CENTER")
             myPlate.nameText:SetWidth(0)
             myPlate.nameText:SetWordWrap(true)
         end
         myPlate._lastNameInHealthbar = ns.c_nameInHealthbar
+        myPlate._lastNameTextYOffset = ns.c_nameTextYOffset
         -- Also fix healthText alignment
         if myPlate.healthText then
             myPlate.healthText:ClearAllPoints()
@@ -5496,12 +5627,12 @@ function ns:FullPlateUpdate(myPlate, unit)
             myPlate.levelText._lastPositionKey = nil
         end
     end
-    
+
     myPlate.hp:Show()
     if myPlate.totemIconFrame then
         myPlate.totemIconFrame:Hide()
     end
-    
+
     -- Determine scale: pet scale, target scale, friendly scale, or normal scale
     local isTarget = UnitIsUnit(unit, "target")
     if isPet then
@@ -5518,28 +5649,31 @@ function ns:FullPlateUpdate(myPlate, unit)
     else
         myPlate:SetScale(ns.c_scale)
     end
-    
+
     -- Health & Color
     UpdateHealth(unit)
+    if ns.UpdateNameplateAuraColorOverride then
+        ns.UpdateNameplateAuraColorOverride(myPlate, unit)
+    end
     UpdateColor(unit)
-    
+
     -- Raid icon
     UpdateRaidIcon(unit)
-    
+
     -- Level indicator
     UpdateLevelText(unit)
-    
+
     -- Classification indicator (elite/rare/boss)
-    UpdateClassificationIndicator(unit)
-    
+    ns.UpdateClassificationIndicator(unit)
+
     -- Quest objective icon
     UpdateQuestIcon(unit)
-    
+
     -- Re-anchor threat text after level/quest visibility is set (for "right_name" mode)
     if ns.c_threatTextAnchor == "right_name" and myPlate.threatText and myPlate.threatText:IsShown() then
         UpdateThreatTextAnchor(myPlate)
     end
-    
+
     -- Combo points only for target (if enabled, not friendly, and not using personal bar mode)
     if UnitIsUnit(unit, "target") and ns.c_showComboPoints and not ns.c_cpOnPersonalBar and not isFriendly then
         EnsureComboPoints(myPlate)
@@ -5560,21 +5694,21 @@ function ns:FullPlateUpdate(myPlate, unit)
             myPlate.cps[i]:Hide()
         end
     end
-    
+
     -- Create castbar for all full plates (deferred)
     -- Note: Castbars are not shown for name-only plates (handled by Core.lua lite system)
     EnsureCastbar(myPlate)
-    
+
     -- Update auras (defined in Auras.lua)
     if ns.UpdateAuras then
         ns:UpdateAuras(myPlate, unit)
     end
-    
+
     -- Update TurboDebuff (BigDebuffs-style priority aura)
     if ns.UpdateTurboDebuff then
         ns:UpdateTurboDebuff(myPlate, unit)
     end
-    
+
     -- Update healer icon (CLEU-based detection from HealerDetection.lua)
     if ns.UpdateHealerIcon then
         ns:UpdateHealerIcon(myPlate, unit)
@@ -5585,21 +5719,21 @@ end
 -- Full components are added on-demand via EnsureFullPlate()
 function ns:CreatePlateFrame(parentFrame, unit)
     local myPlate = CreateFrame("Frame", nil, parentFrame)
-    
+
     local width, height = C_NamePlateManager_GetNamePlateSize()
     PixelUtil.SetSize(myPlate, width, height, 1, 1)
     PixelUtil.SetPoint(myPlate, "CENTER", parentFrame, "CENTER", 0, 0, 1, 1)
     myPlate:SetFrameLevel(parentFrame:GetFrameLevel() + 1)
     myPlate:EnableMouse(false)  -- Pass through clicks
     parentFrame.myPlate = myPlate
-    
+
     myPlate.parentPlate = parentFrame
     myPlate.unit = unit
     myPlate.cachedGUID = UnitGUID(unit)
 
     -- MINIMAL CREATION: Just nameText and guildText
     -- Health bar, castbar, combo points created on-demand
-    
+
     local nameText = myPlate:CreateFontString(nil, "OVERLAY")
     PixelUtil.SetPoint(nameText, "BOTTOM", myPlate, "BOTTOM", 0, 0, 1, 1)
     nameText:SetTextColor(1, 1, 1)  -- White by default, will be set properly in FullPlateUpdate
@@ -5615,8 +5749,8 @@ function ns:CreatePlateFrame(parentFrame, unit)
     myPlate.guildText = guildText
 
     -- Apply font styles (using cached values)
-    nameText:SetFont(ns.c_font, ns.c_fontSize, ns.c_fontOutline)
-    guildText:SetFont(ns.c_font, math_max(ns.c_fontSize - 2, 8), ns.c_fontOutline)
+    ns:SetFontSafe(nameText, ns.c_font, ns.c_fontSize, ns.c_fontOutline)
+    ns:SetFontSafe(guildText, ns.c_font, math_max(ns.c_fontSize - 2, 8), ns.c_fontOutline)
 
     -- Create aura containers (defined in Auras.lua)
     if ns.CreateAuraContainers then
@@ -5735,15 +5869,15 @@ local pendingPersonal = {
 -- Process all pending personal bar updates in one batch
 local function ProcessPersonalUpdates()
     pendingTimers.personal = nil
-    
+
     if not ns.c_personalEnabled or not personalPlateRef then
         pendingPersonal.health = false
         pendingPersonal.power = false
         return
     end
-    
+
     local myPlate = personalPlateRef
-    
+
     -- Update health
     if pendingPersonal.health and myPlate.hp then
         local health = UnitHealth("player")
@@ -5771,7 +5905,7 @@ local function ProcessPersonalUpdates()
         UpdateHealPrediction(myPlate)
         pendingPersonal.health = false
     end
-    
+
     -- Update power
     if pendingPersonal.power and myPlate.powerBar then
         UpdatePowerBar(myPlate, "player")
@@ -5870,12 +6004,18 @@ eventFrame:SetScript("OnEvent", function(self, event, unit)
         if UnitExists("mouseover") then
             local mouseoverPlate = C_NamePlate_GetNamePlateForUnit("mouseover")
             if mouseoverPlate and mouseoverPlate._unit then
-                local myPlate = ns.unitToPlate[mouseoverPlate._unit]
-                -- Skip highlight on personal plate (player doesn't need to highlight themselves)
-                if myPlate and myPlate.highlight and not myPlate.isPlayer then
-                    myPlate.highlight.unit = mouseoverPlate._unit  -- Track which unit this is
-                    myPlate.highlight.elapsed = 0  -- Reset timer
-                    myPlate.highlight:Show()  -- OnUpdate will auto-hide when mouse leaves
+                local mouseoverUnit = mouseoverPlate._unit
+                if mouseoverPlate._isLite and ns.ShowLiteNameHighlight then
+                    ns.ShowLiteNameHighlight(mouseoverPlate, mouseoverUnit)
+                else
+                    local myPlate = ns.unitToPlate[mouseoverUnit]
+                    -- Skip highlight on personal plate (player doesn't need to highlight themselves)
+                    if myPlate and myPlate.highlight and not myPlate.isPlayer then
+                        ApplyMouseoverGlowColor(myPlate.highlight)
+                        myPlate.highlight.unit = mouseoverUnit  -- Track which unit this is
+                        myPlate.highlight.elapsed = 0  -- Reset timer
+                        myPlate.highlight:Show()  -- OnUpdate will auto-hide when mouse leaves
+                    end
                 end
             end
         end
@@ -5891,7 +6031,7 @@ eventFrame:SetScript("OnEvent", function(self, event, unit)
         UpdatePersonalComboPoints()
         -- Update nameplate alphas based on new target state
         if event == "PLAYER_TARGET_CHANGED" then
-            ns.UpdateNameplateAlphas()
+            ns.UpdateNameplateAlphas("target")
         end
     elseif event == "RAID_TARGET_UPDATE" then
         -- Update raid icons for all active nameplates
@@ -5958,7 +6098,7 @@ eventFrame:SetScript("OnEvent", function(self, event, unit)
             dirtyHealth[unit] = true
             ScheduleHealthUpdate()
         end
-    elseif event == "UNIT_MANA" or event == "UNIT_RAGE" or event == "UNIT_ENERGY" 
+    elseif event == "UNIT_MANA" or event == "UNIT_RAGE" or event == "UNIT_ENERGY"
            or event == "UNIT_FOCUS" or event == "UNIT_RUNIC_POWER"
            or event == "UNIT_MAXMANA" or event == "UNIT_MAXRAGE" or event == "UNIT_MAXENERGY"
            or event == "UNIT_MAXFOCUS" or event == "UNIT_MAXRUNIC_POWER"
